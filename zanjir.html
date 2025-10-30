@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantiqiy Zanjir - Aqlli Bolalar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ====== USLUBLAR ====== */
+    :root {
+      --primary: #FF6B6B;
+      --secondary: #4ECDC4;
+      --accent: #FFD166;
+      --dark: #1A535C;
+      --light: #F7FFF7;
+      --success: #06D6A0;
+      --warning: #FF9E64;
+      --bg-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --bg-dark: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+      --text-light: #FFFFFF;
+      --text-dark: #F0F7FF;
+      --card-light: rgba(255, 255, 255, 0.95);
+      --card-dark: rgba(30, 58, 95, 0.95);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Comic Sans MS', 'Chilanka', cursive, sans-serif;
+    }
+    
+    body {
+      background: var(--bg-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      color: var(--text-light);
+      padding: 15px;
+      transition: background 0.5s ease;
+    }
+    
+    body.dark-mode {
+      background: var(--bg-dark);
+    }
+    
+    /* App konteyneri */
+    #app {
+      width: 100%;
+      max-width: 900px;
+      background: var(--card-light);
+      border-radius: 25px;
+      padding: 25px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 8px solid var(--accent);
+      transition: all 0.3s ease;
+    }
+    
+    body.dark-mode #app {
+      background: var(--card-dark);
+      border-color: var(--secondary);
+    }
+    
+    /* Sahifalar */
+    .page {
+      display: none;
+      animation: slideIn 0.5s ease;
+    }
+    
+    .active {
+      display: block;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Sarlavha */
+    h1 {
+      color: var(--dark);
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 3px 3px 0 var(--accent);
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    body.dark-mode h1 {
+      text-shadow: 3px 3px 0 var(--secondary);
+    }
+    
+    h2 {
+      color: var(--dark);
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+    }
+    
+    body.dark-mode h2 {
+      color: var(--text-dark);
+    }
+    
+    /* Bosh sahifa */
+    .hero {
+      padding: 30px 20px;
+      position: relative;
+    }
+    
+    .logo {
+      font-size: 5rem;
+      margin: 20px 0;
+      animation: bounce 2s infinite;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .lead {
+      font-size: 1.4rem;
+      color: var(--dark);
+      margin-bottom: 30px;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .lead {
+      color: var(--text-dark);
+    }
+    
+    /* Tanga va savol ko'rsatkichi */
+    .stats-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    
+    .stat-item {
+      background: linear-gradient(135deg, var(--accent), #FFB347);
+      padding: 12px 25px;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--dark);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      border: 3px solid white;
+    }
+    
+    /* Jonlar ko'rsatkichi */
+    .lives-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .life {
+      font-size: 2rem;
+      color: var(--primary);
+      transition: all 0.3s ease;
+    }
+    
+    .life.lost {
+      color: #ccc;
+      transform: scale(0.8);
+    }
+    
+    /* Tugmalar */
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--warning));
+      border: none;
+      border-radius: 50px;
+      padding: 18px 35px;
+      font-size: 1.3rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 12px;
+      font-weight: bold;
+      min-width: 220px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 0 rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary), #2BBBAD);
+    }
+    
+    .btn-small {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      min-width: auto;
+    }
+    
+    /* Qobiliyat tugmalari */
+    .ability-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .ability-btn {
+      background: linear-gradient(135deg, #9C27B0, #673AB7);
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+    }
+    
+    .ability-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+    }
+    
+    .ability-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Mantiqiy zanjir o'yini */
+    .sequence-game {
+      margin: 25px 0;
+    }
+    
+    .sequence-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 25px 0;
+    }
+    
+    .sequence-item {
+      width: 140px;
+      height: 140px;
+      background: var(--card-light);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      border: 4px solid var(--accent);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    body.dark-mode .sequence-item {
+      background: var(--card-dark);
+    }
+    
+    .sequence-item.missing {
+      background: rgba(255, 255, 255, 0.3);
+      border: 4px dashed var(--primary);
+      animation: pulseMissing 2s infinite;
+    }
+    
+    @keyframes pulseMissing {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .sequence-item:hover {
+      transform: scale(1.08);
+    }
+    
+    .sequence-item.correct {
+      background: var(--success);
+      animation: celebrate 1s ease;
+    }
+    
+    .sequence-item.wrong {
+      background: var(--primary);
+      animation: shake 0.5s;
+    }
+    
+    .options-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 25px 0;
+    }
+    
+    .option-item {
+      width: 120px;
+      height: 120px;
+      background: var(--card-light);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      border: 4px solid var(--secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    body.dark-mode .option-item {
+      background: var(--card-dark);
+    }
+    
+    .option-item:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .option-item.correct {
+      background: var(--success);
+      animation: celebrate 1s ease;
+    }
+    
+    .option-item.wrong {
+      background: var(--primary);
+      animation: shake 0.5s;
+    }
+    
+    @keyframes celebrate {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.2) rotate(5deg); }
+      50% { transform: scale(1.1) rotate(-5deg); }
+      75% { transform: scale(1.15) rotate(3deg); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+    
+    /* Xabarlar */
+    .hint-box {
+      min-height: 30px;
+      margin: 15px 0;
+      font-weight: bold;
+      color: var(--dark);
+      font-size: 1.2rem;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    body.dark-mode .hint-box {
+      color: var(--text-dark);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Boshqaruv paneli */
+    .control-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+    
+    .control-btn {
+      background: white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: var(--dark);
+      transition: all 0.3s ease;
+    }
+    
+    body.dark-mode .control-btn {
+      background: var(--card-dark);
+      color: var(--text-dark);
+    }
+    
+    .control-btn:hover {
+      transform: scale(1.15) rotate(15deg);
+    }
+    
+    /* Konfetti animatsiyasi */
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+      display: none;
+    }
+    
+    .confetti-piece {
+      position: absolute;
+      width: 12px;
+      height: 25px;
+      background: var(--accent);
+      top: 0;
+      opacity: 0;
+    }
+    
+    /* Game over oynasi */
+    .game-over-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .game-over-content {
+      background: var(--card-light);
+      padding: 40px;
+      border-radius: 25px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border: 8px solid var(--accent);
+      max-width: 500px;
+      animation: scaleIn 0.5s ease;
+    }
+    
+    body.dark-mode .game-over-content {
+      background: var(--card-dark);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Do'kon uslublari */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 25px 0;
+    }
+    
+    .shop-card {
+      background: var(--card-light);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: left;
+      border: 4px solid var(--accent);
+      transition: transform 0.3s ease;
+    }
+    
+    body.dark-mode .shop-card {
+      background: var(--card-dark);
+    }
+    
+    .shop-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .shop-card h4 {
+      color: var(--dark);
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+    }
+    
+    body.dark-mode .shop-card h4 {
+      color: var(--text-dark);
+    }
+    
+    .shop-card p {
+      color: #555;
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+    
+    body.dark-mode .shop-card p {
+      color: #CCC;
+    }
+    
+    .price {
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+    
+    /* Mobil moslashuvchanlik */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      h2 {
+        font-size: 1.8rem;
+      }
+      
+      .btn {
+        min-width: 180px;
+        font-size: 1.1rem;
+        padding: 15px 25px;
+      }
+      
+      .sequence-item {
+        width: 110px;
+        height: 110px;
+        font-size: 3rem;
+      }
+      
+      .option-item {
+        width: 90px;
+        height: 90px;
+        font-size: 2.5rem;
+      }
+      
+      .control-panel {
+        position: static;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      
+      .logo {
+        font-size: 4rem;
+      }
+      
+      .stats-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .ability-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .shop-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Konfetti animatsiyasi -->
+  <div class="confetti" id="confetti"></div>
+  
+  <!-- Game over oynasi -->
+  <div class="game-over-modal" id="gameOverModal" style="display: none;">
+    <div class="game-over-content">
+      <div style="font-size: 4rem; margin-bottom: 20px;">🎮</div>
+      <h2 style="color: var(--dark); margin-bottom: 15px;">O'yin Tugadi!</h2>
+      <p style="color: var(--dark); margin-bottom: 25px; font-size: 1.2rem;">
+        Siz <span id="finalScore">0</span> ta savolga to'g'ri javob berdingiz va <span id="finalCoins">0</span> tanga to'pladingiz!
+      </p>
+      <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn" onclick="startNewGame()">
+          <i class="fas fa-redo"></i> Yangi O'yin
+        </button>
+        <button class="btn btn-secondary" onclick="showPage('home')">
+          <i class="fas fa-home"></i> Bosh Sahifa
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Dekorativ shakllar -->
+  <div class="floating-shapes">
+    <div class="shape" style="top:10%; left:5%;"></div>
+    <div class="shape" style="top:15%; right:8%;"></div>
+    <div class="shape" style="bottom:20%; left:10%;"></div>
+    <div class="shape" style="bottom:15%; right:5%;"></div>
+  </div>
+  
+  <div id="app">
+    <!-- Boshqaruv paneli -->
+    <div class="control-panel">
+      <div class="control-btn" id="themeToggle">
+        <i class="fas fa-moon"></i>
+      </div>
+      <div class="control-btn" onclick="showPage('home')">
+        <i class="fas fa-home"></i>
+      </div>
+    </div>
+    
+    <!-- BOSH SAHIFA -->
+    <section id="home" class="page active">
+      <div class="hero">
+        <div class="logo">🔍</div>
+        <h1>Mantiqiy Zanjir</h1>
+        <p class="lead">Ketma-ketlikdagi sirni oching va tangalar yuting!</p>
+        
+        <div class="stats-container">
+          <div class="stat-item">
+            <span>🪙</span>
+            <span id="coins">0</span> Tanga
+          </div>
+        </div>
+        
+        <div>
+          <button class="btn" onclick="startGame()">
+            <i class="fas fa-play"></i> O'ynashni Boshlash
+          </button>
+          <button class="btn btn-secondary" onclick="showPage('shop')">
+            <i class="fas fa-store"></i> Do'kon
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- O'YIN SAHIFASI -->
+    <section id="game" class="page">
+      <h2>Mantiqiy Zanjir</h2>
+      
+      <div class="sequence-game">
+        <div class="stats-container">
+          <div class="stat-item">
+            <span>🪙</span>
+            <span id="gameCoins">0</span> Tanga
+          </div>
+          <div class="stat-item">
+            <span>📝</span>
+            <span id="questionCount">0</span>/10 Savol
+          </div>
+        </div>
+        
+        <div class="lives-container" id="gameLives">
+          <!-- Jonlar JavaScript orqali qo'shiladi -->
+        </div>
+        
+        <div class="ability-buttons">
+          <button class="ability-btn" id="skipBtn" onclick="useSkip()">
+            <i class="fas fa-forward"></i> O'tkazish (<span id="skipCount">0</span>)
+          </button>
+          <button class="ability-btn" id="hintBtn" onclick="useHint()">
+            <i class="fas fa-lightbulb"></i> Yordam (<span id="hintCount">0</span>)
+          </button>
+        </div>
+        
+        <div class="hint-box" id="hintBox">Ketma-ketlikdagi yetishmayotgan elementni toping!</div>
+        
+        <div class="sequence-container" id="sequenceContainer">
+          <!-- Ketma-ketlik elementlari JavaScript orqali qo'shiladi -->
+        </div>
+        
+        <h3>Yetishmayotgan rasmni tanlang:</h3>
+        <div class="options-container" id="optionsContainer">
+          <!-- Variantlar JavaScript orqali qo'shiladi -->
+        </div>
+      </div>
+    </section>
+    
+    <!-- DO'KON -->
+    <section id="shop" class="page">
+      <h2>🛍️ Do'kon</h2>
+      <p>Tangalaringiz bilan qo'shimcha imkoniyatlar sotib oling!</p>
+      
+      <div class="stats-container">
+        <div class="stat-item">
+          <span>🪙</span>
+          <span id="shopCoins">0</span> Tanga
+        </div>
+      </div>
+      
+      <div class="shop-grid">
+        <div class="shop-card">
+          <h4>⏭️ Savol O'tkazish</h4>
+          <p>Qiyin savolni o'tkazib yuborish imkoniyati</p>
+          <div class="price">Narxi: 5 🪙</div>
+          <button class="btn btn-small" onclick="buyAbility('skip', 5)">Sotib olish</button>
+        </div>
+        
+        <div class="shop-card">
+          <h4>💡 Yordam</h4>
+          <p>Savolga yechim topishda yordam oling</p>
+          <div class="price">Narxi: 3 🪙</div>
+          <button class="btn btn-small" onclick="buyAbility('hint', 3)">Sotib olish</button>
+        </div>
+        
+        <div class="shop-card">
+          <h4>❤️ Qo'shimcha Jon</h4>
+          <p>Qo'shimcha 1 ta jon oling</p>
+          <div class="price">Narxi: 8 🪙</div>
+          <button class="btn btn-small" onclick="buyAbility('life', 8)">Sotib olish</button>
+        </div>
+      </div>
+      
+      <div style="margin-top: 25px;">
+        <button class="btn" onclick="showPage('home')">
+          <i class="fas fa-arrow-left"></i> Bosh Sahifa
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ====== O'ZGARUVCHILAR VA HOLAT ======
+    let coins = 0;
+    let lives = 3;
+    let currentQuestion = 0;
+    let correctAnswers = 0;
+    let darkMode = false;
+    let currentSequence = [];
+    let missingItemIndex = -1;
+    let correctAnswer = null;
+    
+    // Qobiliyatlar
+    let abilities = {
+      skip: 0,
+      hint: 0,
+      life: 0
+    };
+
+    // ====== KONFETTI ANIMATSIYASI ======
+    function createConfetti() {
+      const confetti = document.getElementById('confetti');
+      confetti.innerHTML = '';
+      confetti.style.display = 'block';
+      
+      const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#9C27B0', '#673AB7'];
+      
+      for (let i = 0; i < 150; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+        piece.style.setProperty('--x', (Math.random() - 0.5) * 200 + 'px');
+        
+        confetti.appendChild(piece);
+      }
+      
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fall {
+          0% {
+            transform: translateY(-100px) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(360deg) translateX(var(--x));
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      setTimeout(() => {
+        confetti.style.display = 'none';
+      }, 3000);
+    }
+    
+    // ====== JONLAR FUNKSIYALARI ======
+    function updateLives() {
+      const gameLives = document.getElementById('gameLives');
+      gameLives.innerHTML = '';
+      
+      for (let i = 0; i < 3; i++) {
+        const life = document.createElement('div');
+        life.className = `life ${i < lives ? '' : 'lost'}`;
+        life.innerHTML = '❤️';
+        gameLives.appendChild(life);
+      }
+    }
+    
+    function loseLife() {
+      lives--;
+      updateLives();
+      
+      if (lives <= 0) {
+        setTimeout(() => {
+          endGame();
+        }, 1000);
+      }
+    }
+    
+    // ====== QOBILIYAT FUNKSIYALARI ======
+    function updateAbilities() {
+      document.getElementById('skipCount').textContent = abilities.skip;
+      document.getElementById('hintCount').textContent = abilities.hint;
+      
+      document.getElementById('skipBtn').disabled = abilities.skip <= 0;
+      document.getElementById('hintBtn').disabled = abilities.hint <= 0;
+    }
+    
+    function useSkip() {
+      if (abilities.skip > 0) {
+        abilities.skip--;
+        updateAbilities();
+        generateNewSequence();
+      }
+    }
+    
+    function useHint() {
+      if (abilities.hint > 0) {
+        abilities.hint--;
+        updateAbilities();
+        document.getElementById('hintBox').textContent = `Yordam: To'g'ri javob - ${correctAnswer}`;
+      }
+    }
+    
+    // ====== DO'KON FUNKSIYALARI ======
+    function buyAbility(type, price) {
+      if (coins < price) {
+        alert("Sizda yetarli tanga yo'q!");
+        return;
+      }
+      
+      coins -= price;
+      
+      if (type === 'skip') {
+        abilities.skip++;
+      } else if (type === 'hint') {
+        abilities.hint++;
+      } else if (type === 'life') {
+        lives++;
+        updateLives();
+      }
+      
+      updateUI();
+      updateAbilities();
+      alert("Sotib olindi! Tabriklayman!");
+    }
+    
+    // ====== O'YIN FUNKSIYALARI ======
+    function startGame() {
+      coins = 0;
+      lives = 3;
+      currentQuestion = 0;
+      correctAnswers = 0;
+      updateUI();
+      showPage('game');
+      generateNewSequence();
+    }
+    
+    function startNewGame() {
+      document.getElementById('gameOverModal').style.display = 'none';
+      startGame();
+    }
+    
+    function endGame() {
+      document.getElementById('finalScore').textContent = correctAnswers;
+      document.getElementById('finalCoins').textContent = coins;
+      document.getElementById('gameOverModal').style.display = 'flex';
+    }
+    
+    function generateNewSequence() {
+      if (currentQuestion >= 10) {
+        endGame();
+        return;
+      }
+      
+      currentQuestion++;
+      document.getElementById('questionCount').textContent = currentQuestion;
+      
+      const sequenceTypes = [
+        {
+          name: "Kun davomiyligi",
+          items: ["🌅", "☀️", "🌇", "🌙"],
+          description: "Tong → Quyosh → Oqshom → Tun"
+        },
+        {
+          name: "Mevalar rangi",
+          items: ["🍎", "🍋", "🍇", "🍓"],
+          description: "Qizil → Sariq → Binafsha → Qizil"
+        },
+        {
+          name: "Transport",
+          items: ["🚗", "🚌", "🚂", "✈️"],
+          description: "Mashina → Avtobus → Poyezd → Samolyot"
+        },
+        {
+          name: "Hayvonlar",
+          items: ["🐭", "🐱", "🐶", "🐯"],
+          description: "Sichqon → Mushuk → Kuchuk → Yo'lbars"
+        },
+        {
+          name: "Fasllar",
+          items: ["🌱", "☀️", "🍂", "❄️"],
+          description: "Bahor → Yoz → Kuz → Qish"
+        },
+        {
+          name: "Raqamlar",
+          items: ["1️⃣", "2️⃣", "3️⃣", "4️⃣"],
+          description: "Bir → Ikki → Uch → To'rt"
+        }
+      ];
+      
+      const sequenceType = sequenceTypes[Math.floor(Math.random() * sequenceTypes.length)];
+      currentSequence = [...sequenceType.items];
+      
+      missingItemIndex = Math.floor(Math.random() * currentSequence.length);
+      correctAnswer = currentSequence[missingItemIndex];
+      
+      const sequenceContainer = document.getElementById('sequenceContainer');
+      sequenceContainer.innerHTML = '';
+      
+      currentSequence.forEach((item, index) => {
+        const sequenceItem = document.createElement('div');
+        sequenceItem.className = 'sequence-item';
+        
+        if (index === missingItemIndex) {
+          sequenceItem.classList.add('missing');
+          sequenceItem.textContent = '?';
+        } else {
+          sequenceItem.textContent = item;
+        }
+        
+        sequenceContainer.appendChild(sequenceItem);
+      });
+      
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+      
+      const options = [correctAnswer];
+      while (options.length < 4) {
+        const allItems = sequenceTypes.flatMap(st => st.items);
+        const randomOption = allItems[Math.floor(Math.random() * allItems.length)];
+        if (!options.includes(randomOption)) {
+          options.push(randomOption);
+        }
+      }
+      
+      options.sort(() => Math.random() - 0.5);
+      
+      options.forEach(option => {
+        const optionItem = document.createElement('div');
+        optionItem.className = 'option-item';
+        optionItem.textContent = option;
+        optionItem.onclick = () => checkAnswer(option, optionItem);
+        optionsContainer.appendChild(optionItem);
+      });
+      
+      document.getElementById('hintBox').textContent = sequenceType.description;
+    }
+    
+    function checkAnswer(selectedItem, element) {
+      if (selectedItem === correctAnswer) {
+        // To'g'ri javob
+        element.classList.add('correct');
+        document.querySelector(`.sequence-item.missing`).textContent = selectedItem;
+        document.querySelector(`.sequence-item.missing`).classList.add('correct');
+        document.querySelector(`.sequence-item.missing`).classList.remove('missing');
+        
+        coins += 2; // To'g'ri javob uchun 2 tanga
+        correctAnswers++;
+        createConfetti();
+        
+        setTimeout(() => {
+          if (lives > 0 && currentQuestion < 10) {
+            generateNewSequence();
+          } else {
+            endGame();
+          }
+        }, 2000);
+      } else {
+        // Noto'g'ri javob
+        element.classList.add('wrong');
+        loseLife(); // 1 jon yo'qotiladi
+        
+        setTimeout(() => {
+          if (lives > 0 && currentQuestion < 10) {
+            generateNewSequence();
+          } else {
+            endGame();
+          }
+        }, 1000);
+      }
+      
+      updateUI();
+    }
+    
+    // ====== SAHIFA NAVIGATSIYASI ======
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      updateUI();
+    }
+    
+    function updateUI() {
+      document.getElementById('coins').textContent = coins;
+      document.getElementById('gameCoins').textContent = coins;
+      document.getElementById('shopCoins').textContent = coins;
+      updateLives();
+      updateAbilities();
+    }
+    
+    // ====== TEMA BOSHQARUVI ======
+    function toggleTheme() {
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode', darkMode);
+      
+      const themeIcon = document.querySelector('#themeToggle i');
+      if (darkMode) {
+        themeIcon.className = 'fas fa-sun';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        themeIcon.className = 'fas fa-moon';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+    
+    // ====== DASTLABKI SOZLAMALAR ======
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        darkMode = true;
+        document.body.classList.add('dark-mode');
+        document.querySelector('#themeToggle i').className = 'fas fa-sun';
+      }
+      
+      document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+      
+      updateUI();
+    });
+  </script>
+</body>
+</html>

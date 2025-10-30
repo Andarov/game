@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matematika O'yini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .screen {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .game-header {
+            margin-bottom: 25px;
+        }
+        
+        .game-title {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .game-subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .coin-display {
+            background: linear-gradient(45deg, #FFD700, #FFC107);
+            border-radius: 15px;
+            padding: 10px 20px;
+            margin: 15px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #8B6914;
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .menu-btn {
+            padding: 15px 25px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 0 #4c51bf;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 0 #4c51bf;
+        }
+        
+        .menu-btn.secondary {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            box-shadow: 0 4px 0 #2f855a;
+        }
+        
+        .menu-btn.secondary:hover {
+            box-shadow: 0 6px 0 #2f855a;
+        }
+        
+        .progress-section {
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 12px;
+            color: #718096;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .question-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            color: white;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .question-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .equation {
+            font-size: 3rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .missing-number {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 20px;
+            min-width: 80px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        
+        .option-btn.correct {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+            transform: scale(1.05);
+        }
+        
+        .option-btn.incorrect {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+            transform: scale(0.95);
+        }
+        
+        .feedback-message {
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .feedback-correct {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .feedback-incorrect {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .shop-item {
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #2196F3;
+            transition: all 0.3s ease;
+        }
+        
+        .shop-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .item-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .item-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 8px;
+        }
+        
+        .item-price {
+            font-size: 1em;
+            color: #FF6B6B;
+            margin-bottom: 10px;
+        }
+        
+        .buy-btn {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .buy-btn:disabled {
+            background: #CCCCCC;
+            cursor: not-allowed;
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .confetti {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: fall 3s ease-in-out infinite;
+        }
+        
+        /* Qobiliyatlar paneli */
+        .abilities-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .abilities-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #FF9800, #FF5722);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .abilities-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .abilities-menu {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: none;
+            width: 280px;
+            z-index: 101;
+        }
+
+        .abilities-menu.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ability-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .ability-item:last-child {
+            border-bottom: none;
+        }
+
+        .ability-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .ability-icon {
+            font-size: 1.8rem;
+            width: 40px;
+            text-align: center;
+        }
+
+        .ability-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        .ability-count {
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .use-ability-btn {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .use-ability-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .use-ability-btn:hover:not(:disabled) {
+            background: linear-gradient(45deg, #38a169, #2f855a);
+            transform: translateY(-2px);
+        }
+
+        /* Qobiliyat effektlari */
+        .hint-effect {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { background-color: rgba(255, 255, 255, 0.9); }
+            50% { background-color: rgba(255, 255, 200, 0.9); }
+            100% { background-color: rgba(255, 255, 255, 0.9); }
+        }
+
+        .time-effect {
+            animation: timeGlow 2s infinite;
+        }
+
+        @keyframes timeGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 193, 7, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 193, 7, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 193, 7, 0.5); }
+        }
+
+        .double-effect {
+            animation: doubleGlow 2s infinite;
+        }
+
+        @keyframes doubleGlow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .skip-effect {
+            animation: skipShake 0.5s;
+        }
+
+        @keyframes skipShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Mobil moslashuv */
+        @media (max-width: 480px) {
+            .screen {
+                padding: 20px;
+            }
+            
+            .game-title {
+                font-size: 1.8rem;
+            }
+            
+            .equation {
+                font-size: 2.2rem;
+            }
+            
+            .question-text {
+                font-size: 2rem;
+            }
+            
+            .option-btn {
+                padding: 15px;
+                font-size: 1.3rem;
+            }
+            
+            .stats-container {
+                padding: 12px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .shop-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .abilities-panel {
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .abilities-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .abilities-menu {
+                width: 260px;
+                right: -10px;
+            }
+            
+            .ability-item {
+                padding: 10px 0;
+            }
+            
+            .ability-icon {
+                font-size: 1.6rem;
+            }
+            
+            .ability-name {
+                font-size: 0.9rem;
+            }
+            
+            .use-ability-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                min-width: 70px;
+            }
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Asosiy sahifa -->
+    <div id="mainScreen" class="screen active">
+        <div class="game-header">
+            <h1 class="game-title">🧮 Matematika O'yini</h1>
+            <p class="game-subtitle">Matematikani o'rganish - qiziqarli o'yin!</p>
+        </div>
+        
+        <div class="coin-display">
+            <span>💰 Tangalar:</span>
+            <span id="totalCoins">0</span>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn" onclick="showScreen('gameScreen')">🎮 O'ynash</button>
+            <button class="menu-btn secondary" onclick="showScreen('shopScreen')">🏪 Dokon</button>
+        </div>
+    </div>
+    
+    <!-- O'yin sahifasi -->
+    <div id="gameScreen" class="screen">
+        <div class="game-header">
+            <h1 class="game-title">🎮 Matematika Testi</h1>
+            <p class="game-subtitle">10 ta savolga javob bering</p>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-label">Daraja</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Ball</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Savol: 1/10</div>
+        </div>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-diff="easy">Oson</button>
+            <button class="difficulty-btn" data-diff="medium">O'rta</button>
+            <button class="difficulty-btn" data-diff="hard">Qiyin</button>
+        </div>
+        
+        <div class="question-box">
+            <div class="question-text">Toping</div>
+            <div class="equation">
+                <span id="num1">7</span>
+                <span id="operator">×</span>
+                <span class="missing-number" id="missingNum">?</span>
+                <span>=</span>
+                <span id="result">63</span>
+            </div>
+        </div>
+        
+        <div class="options-grid" id="optionsContainer">
+            <button class="option-btn" data-value="7">7</button>
+            <button class="option-btn" data-value="8">8</button>
+            <button class="option-btn" data-value="9">9</button>
+            <button class="option-btn" data-value="6">6</button>
+        </div>
+        
+        <div class="feedback-message" id="feedback">
+            Javobingizni tanlang
+        </div>
+        
+        <!-- Qobiliyatlar paneli -->
+        <div class="abilities-panel">
+            <button class="abilities-btn" id="abilitiesToggle">⚡</button>
+            <div class="abilities-menu" id="abilitiesMenu">
+                <div class="ability-item">
+                    <div class="ability-info">
+                        <span class="ability-icon">⏰</span>
+                        <span class="ability-name">Qo'shimcha Vaqt</span>
+                        <span class="ability-count" id="timeCount">0</span>
+                    </div>
+                    <button class="use-ability-btn" id="useTime" onclick="useAbility('time')" disabled>Ishlatish</button>
+                </div>
+                
+                <div class="ability-item">
+                    <div class="ability-info">
+                        <span class="ability-icon">💡</span>
+                        <span class="ability-name">Aqlli Maslahat</span>
+                        <span class="ability-count" id="hintCount">0</span>
+                    </div>
+                    <button class="use-ability-btn" id="useHint" onclick="useAbility('hint')" disabled>Ishlatish</button>
+                </div>
+                
+                <div class="ability-item">
+                    <div class="ability-info">
+                        <span class="ability-icon">🚀</span>
+                        <span class="ability-name">Savol O'tkazish</span>
+                        <span class="ability-count" id="skipCount">0</span>
+                    </div>
+                    <button class="use-ability-btn" id="useSkip" onclick="useAbility('skip')" disabled>Ishlatish</button>
+                </div>
+                
+                <div class="ability-item">
+                    <div class="ability-info">
+                        <span class="ability-icon">🎯</span>
+                        <span class="ability-name">Ikki barobar ball</span>
+                        <span class="ability-count" id="doubleCount">0</span>
+                    </div>
+                    <button class="use-ability-btn" id="useDouble" onclick="useAbility('double')" disabled>Ishlatish</button>
+                </div>
+            </div>
+        </div>
+        
+        <button class="menu-btn secondary" onclick="showScreen('mainScreen')">🏠 Bosh sahifa</button>
+    </div>
+    
+    <!-- Natija sahifasi -->
+    <div id="resultScreen" class="screen">
+        <div class="game-header">
+            <h1 class="game-title">🎉 Test Yakunlandi!</h1>
+            <p class="game-subtitle">Natijangizni ko'ring</p>
+        </div>
+        
+        <div class="result-score" id="finalScore" style="font-size: 3rem; color: #667eea; margin: 20px 0; font-weight: 700;">0/100</div>
+        <div class="result-message" id="resultMessage" style="font-size: 1.2rem; color: #718096; margin: 15px 0;"></div>
+        
+        <div class="coin-display">
+            <span>🎉 Siz qozondingiz:</span>
+            <span id="earnedCoins">0</span>
+            <span>tanga!</span>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn" onclick="restartGame()">🔄 Qayta O'ynash</button>
+            <button class="menu-btn secondary" onclick="showScreen('mainScreen')">🏠 Bosh Sahifa</button>
+        </div>
+    </div>
+    
+    <!-- Dokon sahifasi -->
+    <div id="shopScreen" class="screen">
+        <div class="game-header">
+            <h1 class="game-title">🏪 Matematika Dokoni</h1>
+            <p class="game-subtitle">Qobiliyatlaringizni yaxshilang</p>
+        </div>
+        
+        <div class="coin-display">
+            <span>💰 Tangalar:</span>
+            <span id="shopCoins">0</span>
+        </div>
+        
+        <div class="shop-items">
+            <div class="shop-item">
+                <div class="item-icon">⏰</div>
+                <div class="item-name">Qo'shimcha Vaqt</div>
+                <div class="item-price">Narx: 50 tanga</div>
+                <button class="buy-btn" onclick="buyItem('time')">Sotib olish</button>
+            </div>
+            
+            <div class="shop-item">
+                <div class="item-icon">💡</div>
+                <div class="item-name">Aqlli Maslahat</div>
+                <div class="item-price">Narx: 30 tanga</div>
+                <button class="buy-btn" onclick="buyItem('hint')">Sotib olish</button>
+            </div>
+            
+            <div class="shop-item">
+                <div class="item-icon">🚀</div>
+                <div class="item-name">Savol O'tkazish</div>
+                <div class="item-price">Narx: 40 tanga</div>
+                <button class="buy-btn" onclick="buyItem('skip')">Sotib olish</button>
+            </div>
+            
+            <div class="shop-item">
+                <div class="item-icon">🎯</div>
+                <div class="item-name">Ikki barobar ball</div>
+                <div class="item-price">Narx: 100 tanga</div>
+                <button class="buy-btn" onclick="buyItem('double')">Sotib olish</button>
+            </div>
+        </div>
+        
+        <button class="menu-btn secondary" onclick="showScreen('mainScreen')">🏠 Bosh sahifa</button>
+    </div>
+    
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        // O'yin ma'lumotlari
+        let gameData = {
+            coins: parseInt(localStorage.getItem('mathCoins')) || 0,
+            abilities: JSON.parse(localStorage.getItem('mathAbilities')) || { time: 0, hint: 0, skip: 0, double: 0 }
+        };
+
+        // O'yin holati
+        let gameState = {
+            currentQuestion: 0,
+            totalQuestions: 10,
+            score: 0,
+            level: 1,
+            difficulty: 'easy',
+            correctAnswer: null,
+            isAnswered: false
+        };
+
+        // Savollar bazasi
+        const problems = [
+            { question: "4 + 6 = ?", answer: 10, options: [8, 10, 12, 9] },
+            { question: "7 × 3 = ?", answer: 21, options: [20, 21, 24, 18] },
+            { question: "15 - 8 = ?", answer: 7, options: [6, 7, 8, 9] },
+            { question: "12 ÷ 4 = ?", answer: 3, options: [2, 3, 4, 6] },
+            { question: "9 + 7 = ?", answer: 16, options: [15, 16, 17, 14] },
+            { question: "5 × 4 = ?", answer: 20, options: [18, 20, 22, 24] },
+            { question: "18 - 9 = ?", answer: 9, options: [8, 9, 10, 7] },
+            { question: "24 ÷ 6 = ?", answer: 4, options: [3, 4, 5, 6] },
+            { question: "8 + 9 = ?", answer: 17, options: [16, 17, 18, 15] },
+            { question: "6 × 7 = ?", answer: 42, options: [40, 42, 44, 48] }
+        ];
+
+        // Elementlar
+        const elements = {
+            level: document.getElementById('level'),
+            score: document.getElementById('score'),
+            progressFill: document.getElementById('progressFill'),
+            progressText: document.getElementById('progressText'),
+            num1: document.getElementById('num1'),
+            operator: document.getElementById('operator'),
+            missingNum: document.getElementById('missingNum'),
+            result: document.getElementById('result'),
+            optionsContainer: document.getElementById('optionsContainer'),
+            feedback: document.getElementById('feedback'),
+            celebration: document.getElementById('celebration'),
+            totalCoins: document.getElementById('totalCoins'),
+            shopCoins: document.getElementById('shopCoins'),
+            earnedCoins: document.getElementById('earnedCoins'),
+            finalScore: document.getElementById('finalScore'),
+            resultMessage: document.getElementById('resultMessage')
+        };
+
+        // Qobiliyatlar funksiyasi
+        let activeAbility = null;
+
+        // Qobiliyatlar menyusini boshqarish
+        document.getElementById('abilitiesToggle').addEventListener('click', function() {
+            const menu = document.getElementById('abilitiesMenu');
+            menu.classList.toggle('active');
+            
+            // Qobiliyatlar sonini yangilash
+            updateAbilityCounts();
+        });
+
+        // Qobiliyatlar sonini yangilash
+        function updateAbilityCounts() {
+            document.getElementById('timeCount').textContent = gameData.abilities.time || 0;
+            document.getElementById('hintCount').textContent = gameData.abilities.hint || 0;
+            document.getElementById('skipCount').textContent = gameData.abilities.skip || 0;
+            document.getElementById('doubleCount').textContent = gameData.abilities.double || 0;
+            
+            // Agar qobiliyatlar mavjud bo'lsa, tugmalarni faollashtirish
+            document.getElementById('useTime').disabled = !gameData.abilities.time;
+            document.getElementById('useHint').disabled = !gameData.abilities.hint || gameState.isAnswered;
+            document.getElementById('useSkip').disabled = !gameData.abilities.skip || gameState.isAnswered;
+            document.getElementById('useDouble').disabled = !gameData.abilities.double;
+        }
+
+        // Qobiliyatni ishlatish
+        function useAbility(ability) {
+            if (gameData.abilities[ability] > 0) {
+                switch(ability) {
+                    case 'time':
+                        useTimeAbility();
+                        break;
+                    case 'hint':
+                        useHintAbility();
+                        break;
+                    case 'skip':
+                        useSkipAbility();
+                        break;
+                    case 'double':
+                        useDoubleAbility();
+                        break;
+                }
+                
+                // Qobiliyatlar sonini kamaytirish
+                gameData.abilities[ability]--;
+                saveGameData();
+                updateAbilityCounts();
+                
+                // Menyuni yopish
+                document.getElementById('abilitiesMenu').classList.remove('active');
+            }
+        }
+
+        // Vaqt qobiliyati
+        function useTimeAbility() {
+            // Vaqt qo'shish effekti
+            document.querySelector('.question-box').classList.add('time-effect');
+            setTimeout(() => {
+                document.querySelector('.question-box').classList.remove('time-effect');
+            }, 2000);
+            
+            alert("⏰ Qo'shimcha vaqt qobiliyati ishlatildi!");
+        }
+
+        // Maslahat qobiliyati
+        function useHintAbility() {
+            if (gameState.isAnswered) return;
+            
+            // To'g'ri javobni ko'rsatish
+            const correctOption = document.querySelector(`.option-btn[data-value="${gameState.correctAnswer}"]`);
+            correctOption.classList.add('hint-effect');
+            
+            setTimeout(() => {
+                correctOption.classList.remove('hint-effect');
+            }, 3000);
+            
+            alert("💡 Maslahat qobiliyati ishlatildi! To'g'ri javob yoritib ko'rsatildi!");
+        }
+
+        // O'tkazib yuborish qobiliyati
+        function useSkipAbility() {
+            if (gameState.isAnswered) return;
+            
+            // Joriy savolni o'tkazib yuborish
+            document.querySelector('.question-box').classList.add('skip-effect');
+            setTimeout(() => {
+                document.querySelector('.question-box').classList.remove('skip-effect');
+                generateQuestion();
+            }, 500);
+            
+            alert("🚀 Savol o'tkazib yuborildi! Keyingi savolga o'tdingiz.");
+        }
+
+        // Ikki barobar ball qobiliyati
+        function useDoubleAbility() {
+            activeAbility = 'double';
+            
+            // Ballarni ikki barobar ko'paytirish effekti
+            document.getElementById('score').classList.add('double-effect');
+            
+            alert("🎯 Ikki barobar ball qobiliyati faollashtirildi! Keyingi to'g'ri javoblaringiz 2 barobar ball beradi!");
+        }
+
+        // Sahifalarni ko'rsatish
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            
+            if (screenId === 'mainScreen') {
+                updateCoinDisplay();
+            } else if (screenId === 'shopScreen') {
+                elements.shopCoins.textContent = gameData.coins;
+            } else if (screenId === 'gameScreen') {
+                startGame();
+            }
+        }
+
+        // Tangalarni yangilash
+        function updateCoinDisplay() {
+            elements.totalCoins.textContent = gameData.coins;
+        }
+
+        // O'yinni boshlash
+        function startGame() {
+            gameState.currentQuestion = 0;
+            gameState.score = 0;
+            gameState.isAnswered = false;
+            
+            elements.score.textContent = '0';
+            generateQuestion();
+        }
+
+        // Savol yaratish
+        function generateQuestion() {
+            if (gameState.currentQuestion >= gameState.totalQuestions) {
+                showResults();
+                return;
+            }
+
+            gameState.currentQuestion++;
+            gameState.isAnswered = false;
+            updateProgress();
+            resetUI();
+
+            // Qiyinlik sozlamalari
+            const difficultySettings = {
+                easy: { maxNumber: 10, operations: ['+', '-'] },
+                medium: { maxNumber: 20, operations: ['+', '-', '×'] },
+                hard: { maxNumber: 50, operations: ['+', '-', '×', '÷'] }
+            };
+
+            const settings = difficultySettings[gameState.difficulty];
+            const operation = settings.operations[Math.floor(Math.random() * settings.operations.length)];
+            
+            let num1, num2;
+            switch(operation) {
+                case '+':
+                    num1 = Math.floor(Math.random() * settings.maxNumber) + 1;
+                    num2 = Math.floor(Math.random() * settings.maxNumber) + 1;
+                    gameState.correctAnswer = num1 + num2;
+                    break;
+                case '-':
+                    num1 = Math.floor(Math.random() * settings.maxNumber) + 5;
+                    num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
+                    gameState.correctAnswer = num1 - num2;
+                    break;
+                case '×':
+                    num1 = Math.floor(Math.random() * 8) + 2;
+                    num2 = Math.floor(Math.random() * 8) + 2;
+                    gameState.correctAnswer = num1 * num2;
+                    break;
+                case '÷':
+                    num2 = Math.floor(Math.random() * 8) + 2;
+                    gameState.correctAnswer = Math.floor(Math.random() * 8) + 2;
+                    num1 = num2 * gameState.correctAnswer;
+                    break;
+            }
+
+            // Faqat ikkinchi raqam yashiriladi
+            elements.num1.textContent = num1;
+            elements.operator.textContent = operation;
+            elements.missingNum.textContent = '?';
+            elements.result.textContent = gameState.correctAnswer;
+            gameState.correctAnswer = num2;
+
+            generateOptions();
+            
+            // Qobiliyatlar menyusini yangilash
+            updateAbilityCounts();
+        }
+
+        // Variantlarni yaratish
+        function generateOptions() {
+            const options = [gameState.correctAnswer];
+            
+            while (options.length < 4) {
+                const offset = Math.floor(Math.random() * 3) + 1;
+                const option = Math.random() > 0.5 ? 
+                    gameState.correctAnswer + offset : 
+                    gameState.correctAnswer - offset;
+                
+                if (option > 0 && !options.includes(option)) {
+                    options.push(option);
+                }
+            }
+
+            // Aralashtirish
+            options.sort(() => Math.random() - 0.5);
+
+            // Variantlarni chiqarish
+            const optionBtns = elements.optionsContainer.querySelectorAll('.option-btn');
+            optionBtns.forEach((btn, index) => {
+                btn.textContent = options[index];
+                btn.dataset.value = options[index];
+                btn.className = 'option-btn';
+            });
+        }
+
+        // Javobni tekshirish
+        function checkAnswer(userAnswer) {
+            gameState.isAnswered = true;
+            const isCorrect = userAnswer === gameState.correctAnswer;
+
+            if (isCorrect) {
+                // Agar double qobiliyati faol bo'lsa
+                let points = 10;
+                if (activeAbility === 'double') {
+                    points *= 2;
+                    // Double qobiliyatini bir marta ishlatish
+                    activeAbility = null;
+                    document.getElementById('score').classList.remove('double-effect');
+                }
+                
+                gameState.score += points;
+                elements.score.textContent = gameState.score;
+                showFeedback(`✅ Toʻgʻri! Ajoyib! +${points} ball`, true);
+                createCelebration();
+            } else {
+                showFeedback(`❌ Notoʻgʻri. Toʻgʻri javob: ${gameState.correctAnswer}`, false);
+            }
+
+            // Qobiliyatlar menyusini yangilash
+            updateAbilityCounts();
+
+            // Keyingi savolga o'tish
+            setTimeout(() => {
+                if (gameState.currentQuestion < gameState.totalQuestions) {
+                    generateQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        // Variantlarni ranglash
+        function highlightOptions(selectedBtn) {
+            const optionBtns = elements.optionsContainer.querySelectorAll('.option-btn');
+            optionBtns.forEach(btn => {
+                const value = parseInt(btn.dataset.value);
+                if (value === gameState.correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn === selectedBtn && value !== gameState.correctAnswer) {
+                    btn.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Progressni yangilash
+        function updateProgress() {
+            const progress = (gameState.currentQuestion / gameState.totalQuestions) * 100;
+            elements.progressFill.style.width = `${progress}%`;
+            elements.progressText.textContent = `Savol: ${gameState.currentQuestion}/${gameState.totalQuestions}`;
+        }
+
+        // UI ni reset qilish
+        function resetUI() {
+            elements.feedback.textContent = 'Javobingizni tanlang';
+            elements.feedback.className = 'feedback-message';
+        }
+
+        // Bayram animatsiyasi
+        function createCelebration() {
+            elements.celebration.style.display = 'block';
+            const emojis = ['🎉', '🎊', '⭐', '🌟', '💫', '✨'];
+
+            for (let i = 0; i < 15; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                elements.celebration.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 3000);
+            }
+
+            setTimeout(() => {
+                elements.celebration.style.display = 'none';
+                elements.celebration.innerHTML = '';
+            }, 3000);
+        }
+
+        // Xabar ko'rsatish
+        function showFeedback(message, isCorrect) {
+            elements.feedback.textContent = message;
+            elements.feedback.className = `feedback-message ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
+        }
+
+        // Natijalarni ko'rsatish
+        function showResults() {
+            const percentage = (gameState.score / (gameState.totalQuestions * 10)) * 100;
+            let message = '';
+            let earnedCoins = Math.floor(gameState.score / 2); // Har 2 ball uchun 1 tanga
+
+            if (percentage >= 90) {
+                message = "Ajoyib! Siz matematika geniysiz! 🎊";
+                earnedCoins += 10; // Bonus tanga
+            } else if (percentage >= 70) {
+                message = "Yaxshi ish! Juda yaxshi natija! 👏";
+                earnedCoins += 5; // Bonus tanga
+            } else if (percentage >= 50) {
+                message = "Yaxshi! Yana bir bor urinib ko'ring! 👍";
+            } else {
+                message = "Qayta urinib ko'ring, siz yaxshilashingiz mumkin! 💪";
+            }
+
+            // Tangalarni qo'shish
+            gameData.coins += earnedCoins;
+            saveGameData();
+
+            elements.finalScore.textContent = `${gameState.score}/${gameState.totalQuestions * 10}`;
+            elements.resultMessage.textContent = message;
+            elements.earnedCoins.textContent = earnedCoins;
+
+            showScreen('resultScreen');
+        }
+
+        // Qobiliyat sotib olish
+        function buyItem(item) {
+            const prices = { time: 50, hint: 30, skip: 40, double: 100 };
+            const price = prices[item];
+            
+            if (gameData.coins >= price) {
+                gameData.coins -= price;
+                gameData.abilities[item] = (gameData.abilities[item] || 0) + 1;
+                saveGameData();
+                updateCoinDisplay();
+                elements.shopCoins.textContent = gameData.coins;
+                alert(`🎉 Qobiliyat sotib olindi!`);
+            } else {
+                alert('❌ Tangalar yetarli emas!');
+            }
+        }
+
+        // O'yinni saqlash
+        function saveGameData() {
+            localStorage.setItem('mathCoins', gameData.coins);
+            localStorage.setItem('mathAbilities', JSON.stringify(gameData.abilities));
+        }
+
+        // O'yinni qayta boshlash
+        function restartGame() {
+            showScreen('gameScreen');
+        }
+
+        // Dastlabki sozlamalar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCoinDisplay();
+            updateAbilityCounts();
+
+            // Qiyinlik darajasi tugmalari
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    gameState.difficulty = this.dataset.diff;
+                });
+            });
+
+            // Variant tugmalari
+            elements.optionsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('option-btn') && !gameState.isAnswered) {
+                    checkAnswer(parseInt(e.target.dataset.value));
+                    highlightOptions(e.target);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

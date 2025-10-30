@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolalar uchun Puzzle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            font-size: 3em;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 0 #ffd166;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.3em;
+            color: #4ecdc4;
+            margin-bottom: 10px;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .image-selector {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            width: 320px;
+        }
+        
+        .image-selector h2 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .image-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .image-option {
+            border: 3px solid #ceb91d;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .image-option:hover {
+            transform: scale(1.05);
+            border-color: #b15867;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .image-option.active {
+            border-color: #6bff97ff;
+            box-shadow: 0 0 15px rgba(255,107,107,0.5);
+        }
+        
+        .image-option img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .image-option p {
+            padding: 6px;
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9em;
+        }
+        
+        .puzzle-container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 500px;
+            max-width: 600px;
+        }
+        
+        .puzzle-board {
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 20px;
+            border: 4px solid #2c8f3b;
+            border-radius: 15px;
+            background: #f0f8ff;
+            display: grid;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .puzzle-piece {
+            position: absolute;
+            border: 2px solid #ffa166;
+            border-radius: 10px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            background-size: 400px 400px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+        
+        .puzzle-piece:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        .puzzle-piece.dragging {
+            cursor: grabbing;
+            transform: scale(1.05) rotate(3deg);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        
+        .puzzle-piece.correct {
+            border: 3px solid #06d6a0;
+            box-shadow: 0 0 15px rgba(6, 214, 160, 0.5);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #dc6565, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+            font-family: 'Comic Sans MS', cursive;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255,107,107,0.6);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .difficulty-selector {
+            margin: 20px 0;
+        }
+        
+        .difficulty-btn {
+            background: #4ecdc4;
+            margin: 0 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+        
+        .difficulty-btn.active {
+            background: #3082b2;
+            transform: scale(1.1);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #5a5a5a;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: rgb(176, 196, 87);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(35, 34, 34, 0.1);
+            min-width: 140px;
+        }
+        
+        .stat-value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #ef0a0a;
+            display: block;
+        }
+        
+        .completed-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(180, 164, 164, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            border: 5px solid #bda56d;
+            max-width: 90%;
+        }
+        
+        .completed-message h2 {
+            color: #b35757;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .completed-message p {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #3fa071ff;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: fall 5s linear infinite;
+            z-index: 999;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(1000px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .original-image {
+            width: 200px;
+            height: 200px;
+            border: 3px solid #05f6e6;
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .original-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .puzzle-container {
+                min-width: 100%;
+            }
+            
+            .puzzle-board {
+                width: 300px;
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .image-selector {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧩 Sudraydigan Puzzle</h1>
+            <p class="subtitle">Bo'laklarni tortib joylashtiring va rasmni tiklang!</p>
+        </header>
+        
+        <div class="game-area">
+            <div class="image-selector">
+                <h2>Rasm Tanlang</h2>
+                <div class="image-options">
+                    <!-- Hayvonlar -->
+                    <div class="image-option active" data-image="animals1">
+                        <img src="https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Sevimli hayvonlar">
+                        <p>Qizil mashina</p>
+                    </div>
+                    <div class="image-option" data-image="animals2">
+                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Mushukcha">
+                        <p>Mushukcha</p>
+                    </div>
+                    <div class="image-option" data-image="animals3">
+                        <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Itcha">
+                        <p>Mushukcha</p>
+                    </div>
+                    
+                    <!-- Mashinalar -->
+                    <div class="image-option" data-image="cars1">
+                        <img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Sport mashina">
+                        <p>Sport mashina</p>
+                    </div>
+                    <div class="image-option" data-image="cars2">
+                        <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Qizil mashina">
+                        <p>Kok mashina</p>
+                    </div>
+                    <div class="image-option" data-image="cars3">
+                        <img src="https://images.unsplash.com/photo-1507136566006-cfc505b114fc?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Yashil mashina">
+                        <p>Qizil mashina</p>
+                    </div>
+                    <div class="image-option" data-image="cars4">
+                        <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Mersedes">
+                        <p>chevrolet</p>
+                    </div>
+                    
+                    <!-- Tabiat -->
+                    <div class="image-option" data-image="nature1">
+                        <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Dagʻ va koʻl">
+                        <p>tog'lar</p>
+                    </div>
+                    <div class="image-option" data-image="nature2">
+                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Oʻrmon">
+                        <p>Oʻrmon</p>
+                    </div>
+                    <div class="image-option" data-image="nature3">
+                        <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Daryo">
+                        <p>lolalar</p>
+                    </div>
+                    <div class="image-option" data-image="nature4">
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Togʻlar">
+                        <p>tog' va ko'l</p>
+                    </div>
+                    
+                    <!-- Koinot -->
+                    <div class="image-option" data-image="space1">
+                        <img src="https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Galaktika">
+                        <p>Galaktika</p>
+                    </div>
+                    <div class="image-option" data-image="space2">
+                        <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Quyosh tutilishi">
+                        <p>Quyosh tutilishi</p>
+                    </div>
+                    <div class="image-option" data-image="space3">
+                        <img src="https://images.unsplash.com/photo-1464802686167-b939a6910659?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Yulduzlar">
+                        <p>Yulduzlar</p>
+                    </div>
+                    <div class="image-option" data-image="space4">
+                        <img src="https://images.unsplash.com/photo-1462332420958-a05d1e002413?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Sayyoralar">
+                        <p>Sayyoralar</p>
+                    </div>
+                    
+                    <!-- Multfilm qahramonlari -->
+                    <div class="image-option" data-image="cartoon1">
+                        <img src="https://images.unsplash.com/photo-1635805737707-575885ab0820?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Orgimchak odam">
+                        <p>Spiderman</p>
+                    </div>
+                    <div class="image-option" data-image="cartoon3">
+                        <img src="https://images.unsplash.com/photo-1578632749014-ca77efd052eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Hello Kitty">
+                        <p>Hello Kitty</p>
+                    </div>
+                    
+                    <!-- Mevalar -->
+                    <div class="image-option" data-image="fruits1">
+                        <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Rangli mevalar">
+                        <p>Rangli mevalar</p>
+                    </div>
+                    <div class="image-option" data-image="fruits2">
+                        <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="bannan">
+                        <p>bannan</p>
+                    </div>
+                    <div class="image-option" data-image="fruits3">
+                        <img src="https://images.unsplash.com/photo-1550258987-190a2d41a8ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Ananas">
+                        <p>Ananas</p>
+                    </div>
+                    <div class="image-option" data-image="fruits4">
+                        <img src="https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Olma">
+                        <p>Olma</p>
+                    </div>
+                    
+                    <!-- O'yinchoqlar -->
+                    <div class="image-option" data-image="toys1">
+                        <img src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Lego">
+                        <p>Lego</p>
+                    </div>
+                    <div class="image-option" data-image="toys2">
+                        <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Puzzle">
+                        <p>Puzzle</p>
+
+                    </div>
+                    <div class="image-option" data-image="toys4">
+                        <img src="https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Qo'g'irchoq">
+                        <p>Sumka</p>
+                    </div>
+                </div>
+                
+                <div class="original-image">
+                    <img id="originalImage" src="https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" alt="Namuna rasm">
+                </div>
+                
+                <div class="difficulty-selector">
+                    <h3>Qiyinlik Darajasi:</h3>
+                    <button class="difficulty-btn active" data-difficulty="3">Oson (3x3)</button>
+                    <button class="difficulty-btn" data-difficulty="4">O'rta (4x4)</button>
+                    <button class="difficulty-btn" data-difficulty="5">Qiyin (5x5)</button>
+                    <button class="difficulty-btn" data-difficulty="6">judda Qiyin (6x6)</button>
+                    <button class="difficulty-btn" data-difficulty="8">max qiyin (8x8)</button> 
+                </div>
+            </div>
+            
+            <div class="puzzle-container">
+                <h2>Puzzle Doskasi</h2>
+                <div class="puzzle-board" id="puzzleBoard">
+                    <!-- Puzzle bo'laklari bu yerda yaratiladi -->
+                </div>
+                
+                <div class="controls">
+                    <button id="shuffleBtn">Aralashtirish</button>
+                    <button id="hintBtn">Yordam</button>
+                    <button id="resetBtn">Qayta Boshlash</button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="moveCount">0</span>
+                        Harakatlar
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="timer">00:00</span>
+                        Vaqt
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="completed-message" id="completedMessage">
+        <h2>Tabriklaymiz! 🎉</h2>
+        <p>Siz puzzleni yechdingiz!</p>
+        <p id="completionStats">Harakatlar: 0 | Vaqt: 00:00</p>
+        <button id="playAgainBtn">Yana O'ynash</button>
+    </div>
+
+    <script>
+        // O'yin o'zgaruvchilari
+        let currentImage = 'animals1';
+        let difficulty = 3;
+        let moves = 0;
+        let timer = 0;
+        let timerInterval;
+        let puzzlePieces = [];
+        let isDragging = false;
+        let dragPiece = null;
+        let dragOffset = { x: 0, y: 0 };
+        
+        // Elementlar
+        const puzzleBoard = document.getElementById('puzzleBoard');
+        const moveCountElement = document.getElementById('moveCount');
+        const timerElement = document.getElementById('timer');
+        const completedMessage = document.getElementById('completedMessage');
+        const completionStats = document.getElementById('completionStats');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const originalImage = document.getElementById('originalImage');
+        
+        // Rasmlar manbalari - 24 ta har xil rasm
+        const imageSources = {
+            // Hayvonlar
+            animals1: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            animals2: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            animals3: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            animals4: 'https://images.unsplash.com/photo-1559243433-5dc1b7b65c5c?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            
+            // Mashinalar
+            cars1: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            cars2: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            cars3: 'https://images.unsplash.com/photo-1507136566006-cfc505b114fc?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            cars4: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            
+            // Tabiat
+            nature1: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            nature2: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            nature3: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            nature4: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            
+            // Koinot
+            space1: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            space2: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            space3: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            space4: 'https://images.unsplash.com/photo-1462332420958-a05d1e002413?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            
+            // Multfilm qahramonlari
+            cartoon1: 'https://images.unsplash.com/photo-1635805737707-575885ab0820?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            cartoon2: 'https://images.unsplash.com/photo-1598890777032-9c63b58d2501?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            cartoon3: 'https://images.unsplash.com/photo-1578632749014-ca77efd052eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            cartoon4: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            
+            // Mevalar
+            fruits1: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            fruits2: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            fruits3: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            fruits4: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            
+            // O'yinchoqlar
+            toys1: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            toys2: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            toys3: 'https://images.unsplash.com/photo-1594787315656-78948448113c?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80',
+            toys4: 'https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80'
+        };
+        
+        // O'yinni boshlash
+        function initGame() {
+            createPuzzlePieces();
+            shufflePieces();
+            startTimer();
+            updateStats();
+        }
+        
+        // Puzzle bo'laklarini yaratish
+        function createPuzzlePieces() {
+            puzzleBoard.innerHTML = '';
+            puzzlePieces = [];
+            
+            const pieceSize = 400 / difficulty;
+            
+            for (let row = 0; row < difficulty; row++) {
+                for (let col = 0; col < difficulty; col++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'puzzle-piece';
+                    piece.dataset.row = row;
+                    piece.dataset.col = col;
+                    piece.dataset.correctRow = row;
+                    piece.dataset.correctCol = col;
+                    
+                    // Bo'lak o'lchamlari va pozitsiyasi
+                    piece.style.width = `${pieceSize}px`;
+                    piece.style.height = `${pieceSize}px`;
+                    
+                    // Rasm fonini sozlash
+                    piece.style.backgroundImage = `url(${imageSources[currentImage]})`;
+                    piece.style.backgroundPosition = `-${col * pieceSize}px -${row * pieceSize}px`;
+                    piece.style.backgroundSize = '400px 400px';
+                    
+                    // Raqam ko'rsatish
+                    piece.textContent = (row * difficulty + col + 1);
+                    
+                    // Drag and drop hodisalari
+                    piece.addEventListener('mousedown', startDrag);
+                    piece.addEventListener('touchstart', startDrag);
+                    
+                    puzzleBoard.appendChild(piece);
+                    puzzlePieces.push(piece);
+                }
+            }
+            
+            // Original rasmni yangilash
+            originalImage.src = imageSources[currentImage];
+        }
+        
+        // Drag boshlash
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            dragPiece = e.target;
+            
+            // Bo'lakni ustiga olib chiqish
+            dragPiece.classList.add('dragging');
+            
+            // Offsetni hisoblash
+            const rect = dragPiece.getBoundingClientRect();
+            if (e.type === 'mousedown') {
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+            } else {
+                dragOffset.x = e.touches[0].clientX - rect.left;
+                dragOffset.y = e.touches[0].clientY - rect.top;
+            }
+            
+            // Global hodisa tinglovchilari
+            document.addEventListener('mousemove', doDrag);
+            document.addEventListener('touchmove', doDrag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchend', stopDrag);
+        }
+        
+        // Drag davom ettirish
+        function doDrag(e) {
+            if (!isDragging || !dragPiece) return;
+            
+            e.preventDefault();
+            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+            
+            const boardRect = puzzleBoard.getBoundingClientRect();
+            
+            // Yangi pozitsiya
+            const newX = clientX - boardRect.left - dragOffset.x;
+            const newY = clientY - boardRect.top - dragOffset.y;
+            
+            // Chegaralarni tekshirish
+            dragPiece.style.left = `${Math.max(0, Math.min(newX, 400 - dragPiece.offsetWidth))}px`;
+            dragPiece.style.top = `${Math.max(0, Math.min(newY, 400 - dragPiece.offsetHeight))}px`;
+        }
+        
+        // Drag tugatish
+        function stopDrag() {
+            if (!isDragging || !dragPiece) return;
+            
+            isDragging = false;
+            dragPiece.classList.remove('dragging');
+            
+            // Bo'lakni eng yaqin katakchaga joylashtirish
+            snapToGrid(dragPiece);
+            
+            // Harakatlar sonini yangilash
+            moves++;
+            updateStats();
+            
+            // Yechilganligini tekshirish
+            checkCompletion();
+            
+            // Hodisa tinglovchilarini olib tashlash
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('touchmove', doDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchend', stopDrag);
+            
+            dragPiece = null;
+        }
+        
+        // Bo'lakni katakchaga joylashtirish
+        function snapToGrid(piece) {
+            const pieceSize = 400 / difficulty;
+            const currentLeft = parseInt(piece.style.left) || 0;
+            const currentTop = parseInt(piece.style.top) || 0;
+            
+            // Eng yaqin katakchani topish
+            const targetCol = Math.round(currentLeft / pieceSize);
+            const targetRow = Math.round(currentTop / pieceSize);
+            
+            // Yangi pozitsiya
+            const newLeft = targetCol * pieceSize;
+            const newTop = targetRow * pieceSize;
+            
+            // Agar bu joyda boshqa bo'lak bo'lsa, ularning o'rnini almashtirish
+            const pieceAtTarget = puzzlePieces.find(p => 
+                parseInt(p.dataset.row) === targetRow && 
+                parseInt(p.dataset.col) === targetCol && 
+                p !== piece
+            );
+            
+            if (pieceAtTarget) {
+                // Bo'laklarning o'rnini almashtirish
+                const tempRow = parseInt(piece.dataset.row);
+                const tempCol = parseInt(piece.dataset.col);
+                
+                // Birinchi bo'lakni yangi joyiga o'tkazish
+                piece.dataset.row = targetRow;
+                piece.dataset.col = targetCol;
+                piece.style.left = `${newLeft}px`;
+                piece.style.top = `${newTop}px`;
+                
+                // Ikkinchi bo'lakni eski joyiga o'tkazish
+                pieceAtTarget.dataset.row = tempRow;
+                pieceAtTarget.dataset.col = tempCol;
+                pieceAtTarget.style.left = `${tempCol * pieceSize}px`;
+                pieceAtTarget.style.top = `${tempRow * pieceSize}px`;
+                
+                // To'g'rilik holatini yangilash
+                checkPiecePosition(piece);
+                checkPiecePosition(pieceAtTarget);
+            } else {
+                // Agar bo'sh joy bo'lsa, oddiygina joylashtirish
+                piece.style.left = `${newLeft}px`;
+                piece.style.top = `${newTop}px`;
+                piece.dataset.row = targetRow;
+                piece.dataset.col = targetCol;
+                
+                // To'g'rilik holatini yangilash
+                checkPiecePosition(piece);
+            }
+        }
+        
+        // Bo'lakning to'g'ri joylashganligini tekshirish
+        function checkPiecePosition(piece) {
+            const currentRow = parseInt(piece.dataset.row);
+            const currentCol = parseInt(piece.dataset.col);
+            const correctRow = parseInt(piece.dataset.correctRow);
+            const correctCol = parseInt(piece.dataset.correctCol);
+            
+            if (currentRow === correctRow && currentCol === correctCol) {
+                piece.classList.add('correct');
+            } else {
+                piece.classList.remove('correct');
+            }
+        }
+        
+        // Bo'laklarni aralashtirish
+        function shufflePieces() {
+            moves = 0;
+            updateStats();
+            
+            const pieceSize = 400 / difficulty;
+            const positions = [];
+            
+            // Barcha mumkin bo'lgan pozitsiyalarni yaratish
+            for (let row = 0; row < difficulty; row++) {
+                for (let col = 0; col < difficulty; col++) {
+                    positions.push({ row, col });
+                }
+            }
+            
+            // Pozitsiyalarni aralashtirish
+            for (let i = positions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [positions[i], positions[j]] = [positions[j], positions[i]];
+            }
+            
+            // Har bir bo'lakka tasodifiy pozitsiya berish
+            puzzlePieces.forEach((piece, index) => {
+                const pos = positions[index];
+                piece.style.left = `${pos.col * pieceSize}px`;
+                piece.style.top = `${pos.row * pieceSize}px`;
+                piece.dataset.row = pos.row;
+                piece.dataset.col = pos.col;
+                
+                // To'g'rilik holatini yangilash
+                checkPiecePosition(piece);
+            });
+        }
+        
+        // Yechilganligini tekshirish
+        function checkCompletion() {
+            let solved = true;
+            
+            for (const piece of puzzlePieces) {
+                const currentRow = parseInt(piece.dataset.row);
+                const currentCol = parseInt(piece.dataset.col);
+                const correctRow = parseInt(piece.dataset.correctRow);
+                const correctCol = parseInt(piece.dataset.correctCol);
+                
+                if (currentRow !== correctRow || currentCol !== correctCol) {
+                    solved = false;
+                    break;
+                }
+            }
+            
+            if (solved) {
+                clearInterval(timerInterval);
+                showCompletionMessage();
+                createConfetti();
+            }
+        }
+        
+        // Tugallanganlik xabarini ko'rsatish
+        function showCompletionMessage() {
+            completionStats.textContent = `Harakatlar: ${moves} | Vaqt: ${formatTime(timer)}`;
+            completedMessage.style.display = 'block';
+        }
+        
+        // Konfetti effekti
+        function createConfetti() {
+            for (let i = 0; i < 150; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.background = getRandomColor();
+                confetti.style.animationDelay = `${Math.random() * 5}s`;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = confetti.style.width;
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        // Tasodifiy rang olish
+        function getRandomColor() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffd166', '#06d6a0', '#118ab2', '#ef476f', '#ff9e00', '#7209b7'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Vaqtni formatlash
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Vaqt hisoblagichini boshlash
+        function startTimer() {
+            clearInterval(timerInterval);
+            timer = 0;
+            timerInterval = setInterval(() => {
+                timer++;
+                timerElement.textContent = formatTime(timer);
+            }, 1000);
+        }
+        
+        // Statistikalarni yangilash
+        function updateStats() {
+            moveCountElement.textContent = moves;
+        }
+        
+        // Hodisa tinglovchilari
+        document.querySelectorAll('.image-option').forEach(option => {
+            option.addEventListener('click', () => {
+                currentImage = option.dataset.image;
+                document.querySelectorAll('.image-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                option.classList.add('active');
+                initGame();
+            });
+        });
+        
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                difficulty = parseInt(btn.dataset.difficulty);
+                document.querySelectorAll('.difficulty-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                btn.classList.add('active');
+                initGame();
+            });
+        });
+        
+        document.getElementById('shuffleBtn').addEventListener('click', shufflePieces);
+        
+        document.getElementById('resetBtn').addEventListener('click', initGame);
+        
+        document.getElementById('hintBtn').addEventListener('click', () => {
+            alert('Bolaklarni sichqoncha yoki barmoq bilan tortib, togri joyiga joylashtiring!');
+        });
+        
+        playAgainBtn.addEventListener('click', () => {
+            completedMessage.style.display = 'none';
+            initGame();
+        });
+        
+        // O'yinni boshlash
+        initGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D So'z Topish O'yini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 900px;
+            height: 700px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #game-header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #game-title {
+            color: white;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        #game-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #lives-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .life {
+            width: 30px;
+            height: 30px;
+            background: #ff4757;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff4757;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        #game-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            height: calc(100% - 150px);
+        }
+
+        #word-display {
+            font-size: 48px;
+            color: white;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            min-height: 60px;
+            letter-spacing: 5px;
+        }
+
+        #hint-container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin: 15px 0;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        #letters-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 30px 0;
+            max-width: 600px;
+        }
+
+        .letter {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #ff9a00, #ff6a00);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 106, 0, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .letter:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 106, 0, 0.6);
+            background: linear-gradient(145deg, #ffaa00, #ff7a00);
+        }
+
+        .letter:disabled {
+            background: linear-gradient(145deg, #777, #555);
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        #game-controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #hint-btn {
+            background: linear-gradient(145deg, #00b894, #00a085);
+            color: white;
+        }
+
+        #hint-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.4);
+        }
+
+        #new-game-btn {
+            background: linear-gradient(145deg, #0984e3, #0767b3);
+            color: white;
+        }
+
+        #new-game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(9, 132, 227, 0.4);
+        }
+
+        #next-btn {
+            background: linear-gradient(145deg, #a29bfe, #6c5ce7);
+            color: white;
+        }
+
+        #next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+        }
+
+        #repeat-btn {
+            background: linear-gradient(145deg, #fd79a8, #e84393);
+            color: white;
+        }
+
+        #repeat-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(232, 67, 147, 0.4);
+        }
+
+        #message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            font-size: 32px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        #floating-letters {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-letter {
+            position: absolute;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.3);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        #score-display {
+            font-size: 24px;
+            color: #ffeaa7;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        #level-display {
+            font-size: 24px;
+            color: #81ecec;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        #timer {
+            font-size: 24px;
+            color: #fd79a8;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .correct {
+            color: #55efc4 !important;
+            text-shadow: 0 0 10px #55efc4 !important;
+        }
+
+        .incorrect {
+            color: #ff7675 !important;
+            text-shadow: 0 0 10px #ff7675 !important;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        #extra-letters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .extra-letter {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #74b9ff, #0984e3);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(116, 185, 255, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .extra-letter:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(116, 185, 255, 0.6);
+        }
+
+        .extra-letter:disabled {
+            background: linear-gradient(145deg, #777, #555);
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .time-added {
+            animation: timeFlash 1s ease;
+        }
+
+        @keyframes timeFlash {
+            0% { background-color: #55efc4; }
+            50% { background-color: #00b894; }
+            100% { background-color: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="floating-letters"></div>
+        
+        <div id="game-header">
+            <h1 id="game-title">3D So'z Topish O'yini</h1>
+            <div id="game-stats">
+                <div id="score-display">Ball: 0</div>
+                <div id="level-display">Level: 1</div>
+                <div id="timer">Vaqt: 60</div>
+                <div id="lives-container">
+                    <div class="life"></div>
+                    <div class="life"></div>
+                    <div class="life"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="game-content">
+            <div id="word-display">_ _ _ _ _</div>
+            <div id="hint-container">Bu hayvon, u "mav" deb ovoz chiqaradi</div>
+            
+            <div id="extra-letters">
+                <!-- Qo'shimcha harflar bu yerda JavaScript orqali yaratiladi -->
+            </div>
+            
+            <div id="letters-container">
+                <!-- Asosiy harflar bu yerda JavaScript orqali yaratiladi -->
+            </div>
+            
+            <div id="game-controls">
+                <button id="hint-btn" class="control-btn">Maslahat</button>
+                <button id="repeat-btn" class="control-btn">Takrorlash</button>
+                <button id="next-btn" class="control-btn">Keyingi</button>
+                <button id="new-game-btn" class="control-btn">Yangi O'yin</button>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // O'yin o'zgaruvchilari
+        const gameState = {
+            words: [
+                { word: "MUCHAL", hint: "Suvda suzadigan, patli hayvon" },
+                { word: "KITOB", hint: "O'qish uchun sahifalardan iborat narsa" },
+                { word: "UY", hint: "Odamlar yashaydigan joy" },
+                { word: "MASHINA", hint: "Yo'l bilan harakatlanadigan transport" },
+                { word: "OLMA", hint: "Qizil yoki yashil rangli meva" },
+                { word: "BOLA", hint: "Kichkina odam" },
+                { word: "MEXMON", hint: "Uyga tashrif buyuradigan odam" },
+                { word: "QUYOSH", hint: "Osmonning eng yorug' yulduzi" },
+                { word: "YOMGIR", hint: "Osmondan suv tomchilari yog'adi" },
+                { word: "DO'ST", hint: "Sizga yaqin, sevimli odam" },
+                { word: "MAMLAKAT", hint: "Ko'p odamlar yashaydigan katta yer" },
+                { word: "MAKTAB", hint: "Bolalar bilim olishadigan joy" },
+                { word: "TELEFON", hint: "Uzoqdan gaplashish uchun qurilma" },
+                { word: "STOL", hint: "Ustiga narsa qo'yish mumkin bo'lgan mebel" },
+                { word: "KULGI", hint: "Xursand bo'lganda chiqadigan ovoz" },
+                { word: "OYNA", hint: "O'z aksini ko'rish mumkin bo'lgan sirt" },
+                { word: "CHIROQ", hint: "Qorong'ida yorug'lik beradigan asbob" },
+                { word: "SHAHAR", hint: "Katta aholi yashaydigan joy" },
+                { word: "DASTURXON", hint: "Ovqat yeyiladigan, ustiga dasturxon yoziladigan joy" },
+                { word: "SAMOLYOT", hint: "Havoda uchadigan transport" }
+            ],
+            currentWord: "",
+            currentHint: "",
+            guessedLetters: [],
+            wrongLetters: [],
+            extraLetters: [],
+            lives: 3,
+            score: 0,
+            level: 1,
+            timer: 60,
+            timerInterval: null,
+            isGameActive: false
+        };
+
+        // DOM elementlari
+        const wordDisplay = document.getElementById('word-display');
+        const hintContainer = document.getElementById('hint-container');
+        const lettersContainer = document.getElementById('letters-container');
+        const extraLettersContainer = document.getElementById('extra-letters');
+        const livesContainer = document.getElementById('lives-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const levelDisplay = document.getElementById('level-display');
+        const timerDisplay = document.getElementById('timer');
+        const messageElement = document.getElementById('message');
+        const hintButton = document.getElementById('hint-btn');
+        const newGameButton = document.getElementById('new-game-btn');
+        const nextButton = document.getElementById('next-btn');
+        const repeatButton = document.getElementById('repeat-btn');
+        const floatingLettersContainer = document.getElementById('floating-letters');
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Canvas sozlamalari
+        canvas.width = 900;
+        canvas.height = 700;
+
+        // 3D fon effekti
+        function drawBackground() {
+            // Gradient fon
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#6a11cb');
+            gradient.addColorStop(1, '#2575fc');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 3D aylanalar
+            for (let i = 0; i < 5; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 100 + 50;
+                
+                const circleGradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+                circleGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+                circleGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = circleGradient;
+                ctx.fill();
+            }
+        }
+
+        // 3D fon animatsiyasi
+        function animateBackground() {
+            drawBackground();
+            requestAnimationFrame(animateBackground);
+        }
+
+        // O'yinni boshlash
+        function startGame() {
+            gameState.isGameActive = true;
+            gameState.lives = 3;
+            gameState.score = 0;
+            gameState.level = 1;
+            updateLivesDisplay();
+            updateScoreDisplay();
+            updateLevelDisplay();
+            startTimer();
+            setupNewWord();
+            createFloatingLetters();
+        }
+
+        // Yangi so'z sozlash
+        function setupNewWord() {
+            // Tasodifiy so'z tanlash
+            const randomIndex = Math.floor(Math.random() * gameState.words.length);
+            gameState.currentWord = gameState.words[randomIndex].word.toUpperCase();
+            gameState.currentHint = gameState.words[randomIndex].hint;
+            gameState.guessedLetters = [];
+            gameState.wrongLetters = [];
+            gameState.extraLetters = [];
+            
+            // Qo'shimcha harflarni yaratish
+            generateExtraLetters();
+            
+            // So'zni ekranga chiqarish
+            displayWord();
+            
+            // Maslahatni ko'rsatish
+            hintContainer.textContent = gameState.currentHint;
+            
+            // Harf tugmalarini yaratish
+            createLetterButtons();
+            createExtraLetterButtons();
+            
+            // Vaqtni qayta boshlash
+            resetTimer();
+        }
+
+        // Qo'shimcha harflarni yaratish
+        function generateExtraLetters() {
+            const alphabet = "ABDEFGHIJKLMNOPQRSTUVXZ"; // O'zbek alifbosi
+            const wordLetters = gameState.currentWord.split('');
+            
+            // So'zdagi harflarni qo'shimcha harflar ro'yxatiga qo'shish
+            gameState.extraLetters = [...wordLetters];
+            
+            // So'zda bo'lmagan 3 ta tasodifiy harf qo'shish
+            const availableLetters = alphabet.split('').filter(letter => !wordLetters.includes(letter));
+            
+            for (let i = 0; i < 3 && availableLetters.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * availableLetters.length);
+                gameState.extraLetters.push(availableLetters[randomIndex]);
+                availableLetters.splice(randomIndex, 1);
+            }
+            
+            // Qo'shimcha harflarni aralashtirish
+            gameState.extraLetters = shuffleArray(gameState.extraLetters);
+        }
+
+        // Massivni aralashtirish
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // So'zni ekranga chiqarish
+        function displayWord() {
+            const displayedWord = gameState.currentWord
+                .split('')
+                .map(letter => gameState.guessedLetters.includes(letter) ? letter : '_')
+                .join(' ');
+            
+            wordDisplay.textContent = displayedWord;
+            
+            // So'z to'liq topilganligini tekshirish
+            if (!displayedWord.includes('_')) {
+                showMessage("Ajoyib! ✅ So'zni topdingiz!", true);
+                gameState.score += 10 * gameState.level;
+                updateScoreDisplay();
+                
+                // Vaqtni qaytarish animatsiyasi
+                timerDisplay.classList.add('time-added');
+                setTimeout(() => {
+                    timerDisplay.classList.remove('time-added');
+                }, 1000);
+                
+                // Keyingi levelga o'tish
+                setTimeout(() => {
+                    gameState.level++;
+                    updateLevelDisplay();
+                    setupNewWord();
+                }, 1500);
+            }
+        }
+
+        // Asosiy harf tugmalarini yaratish
+        function createLetterButtons() {
+            lettersContainer.innerHTML = '';
+            const alphabet = "ABDEFGHIJKLMNOPQRSTUVXZ"; // O'zbek alifbosi
+            
+            for (let letter of alphabet) {
+                const button = document.createElement('button');
+                button.className = 'letter';
+                button.textContent = letter;
+                button.addEventListener('click', () => handleLetterClick(letter, button));
+                lettersContainer.appendChild(button);
+            }
+        }
+
+        // Qo'shimcha harf tugmalarini yaratish
+        function createExtraLetterButtons() {
+            extraLettersContainer.innerHTML = '';
+            
+            for (let letter of gameState.extraLetters) {
+                const button = document.createElement('button');
+                button.className = 'extra-letter';
+                button.textContent = letter;
+                button.addEventListener('click', () => handleExtraLetterClick(letter, button));
+                extraLettersContainer.appendChild(button);
+            }
+        }
+
+        // Asosiy harf bosilganda
+        function handleLetterClick(letter, button) {
+            if (!gameState.isGameActive) return;
+            
+            button.disabled = true;
+            processLetterSelection(letter, button, false);
+        }
+
+        // Qo'shimcha harf bosilganda
+        function handleExtraLetterClick(letter, button) {
+            if (!gameState.isGameActive) return;
+            
+            button.disabled = true;
+            processLetterSelection(letter, button, true);
+        }
+
+        // Harfni qayta ishlash
+        function processLetterSelection(letter, button, isExtra) {
+            if (gameState.currentWord.includes(letter)) {
+                // To'g'ri harf
+                gameState.guessedLetters.push(letter);
+                displayWord();
+                button.style.background = 'linear-gradient(145deg, #00b894, #00a085)';
+                playSound('correct');
+                wordDisplay.classList.add('correct');
+                setTimeout(() => wordDisplay.classList.remove('correct'), 500);
+                
+                // Qo'shimcha harfdan foydalangan bo'lsa, ball qo'shish
+                if (isExtra) {
+                    gameState.score += 2;
+                    updateScoreDisplay();
+                }
+            } else {
+                // Noto'g'ri harf
+                gameState.wrongLetters.push(letter);
+                gameState.lives--;
+                updateLivesDisplay();
+                button.style.background = 'linear-gradient(145deg, #ff4757, #ff3742)';
+                playSound('incorrect');
+                wordDisplay.classList.add('incorrect');
+                setTimeout(() => wordDisplay.classList.remove('incorrect'), 500);
+                
+                // Jonlar tugaganligini tekshirish
+                if (gameState.lives <= 0) {
+                    endGame(false);
+                }
+            }
+        }
+
+        // Jonlarni yangilash
+        function updateLivesDisplay() {
+            const lives = document.querySelectorAll('.life');
+            lives.forEach((life, index) => {
+                life.style.display = index < gameState.lives ? 'block' : 'none';
+            });
+        }
+
+        // Ballarni yangilash
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Ball: ${gameState.score}`;
+        }
+
+        // Levelni yangilash
+        function updateLevelDisplay() {
+            levelDisplay.textContent = `Level: ${gameState.level}`;
+        }
+
+        // Vaqtni boshlash
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+            gameState.timer = 60;
+            timerDisplay.textContent = `Vaqt: ${gameState.timer}`;
+            
+            gameState.timerInterval = setInterval(() => {
+                if (!gameState.isGameActive) return;
+                
+                gameState.timer--;
+                timerDisplay.textContent = `Vaqt: ${gameState.timer}`;
+                
+                if (gameState.timer <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        // Vaqtni qayta boshlash
+        function resetTimer() {
+            gameState.timer = 60;
+            timerDisplay.textContent = `Vaqt: ${gameState.timer}`;
+        }
+
+        // O'yinni tugatish
+        function endGame(isWin) {
+            gameState.isGameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            if (isWin) {
+                showMessage("Tabriklaymiz! 🎉 Siz yutdingiz!", true);
+            } else {
+                showMessage(`Afsus! 😔 Yutqazdingiz. To'g'ri javob: ${gameState.currentWord}`, false);
+            }
+        }
+
+        // Xabar ko'rsatish
+        function showMessage(text, isSuccess) {
+            messageElement.textContent = text;
+            messageElement.style.display = 'block';
+            messageElement.style.background = isSuccess 
+                ? 'linear-gradient(145deg, #00b894, #00a085)' 
+                : 'linear-gradient(145deg, #ff4757, #ff3742)';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // Ovoz effektlari
+        function playSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'correct') {
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Do
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                } else if (type === 'incorrect') {
+                    oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // Past ton
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                }
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log("Ovoz qo'llab-quvvatlanmaydi");
+            }
+        }
+
+        // Suzuvchi harflar yaratish
+        function createFloatingLetters() {
+            floatingLettersContainer.innerHTML = '';
+            const letters = "ABDEFGHIJKLMNOPQRSTUVXZ";
+            
+            for (let i = 0; i < 20; i++) {
+                const letterElement = document.createElement('div');
+                letterElement.className = 'floating-letter';
+                letterElement.textContent = letters[Math.floor(Math.random() * letters.length)];
+                letterElement.style.left = `${Math.random() * 100}%`;
+                letterElement.style.animationDelay = `${Math.random() * 10}s`;
+                letterElement.style.fontSize = `${Math.random() * 20 + 16}px`;
+                floatingLettersContainer.appendChild(letterElement);
+            }
+        }
+
+        // Maslahat berish
+        hintButton.addEventListener('click', () => {
+            if (!gameState.isGameActive) return;
+            
+            // Topilmagan harfni ko'rsatish
+            const unguessedLetters = gameState.currentWord
+                .split('')
+                .filter(letter => !gameState.guessedLetters.includes(letter));
+            
+            if (unguessedLetters.length > 0) {
+                const randomLetter = unguessedLetters[Math.floor(Math.random() * unguessedLetters.length)];
+                gameState.guessedLetters.push(randomLetter);
+                displayWord();
+                
+                // Maslahat uchun ball olib tashlash
+                gameState.score = Math.max(0, gameState.score - 5);
+                updateScoreDisplay();
+                
+                // Tugmalarni yangilash
+                updateAllButtons();
+            }
+        });
+
+        // Keyingi so'zga o'tish
+        nextButton.addEventListener('click', () => {
+            if (!gameState.isGameActive) return;
+            
+            gameState.level++;
+            updateLevelDisplay();
+            setupNewWord();
+        });
+
+        // Hozirgi so'zni takrorlash
+        repeatButton.addEventListener('click', () => {
+            if (!gameState.isGameActive) return;
+            
+            setupNewWord();
+        });
+
+        // Barcha tugmalarni yangilash
+        function updateAllButtons() {
+            const allLetterButtons = document.querySelectorAll('.letter, .extra-letter');
+            allLetterButtons.forEach(button => {
+                const letter = button.textContent;
+                if (gameState.guessedLetters.includes(letter)) {
+                    button.disabled = true;
+                    button.style.background = 'linear-gradient(145deg, #00b894, #00a085)';
+                } else if (gameState.wrongLetters.includes(letter)) {
+                    button.disabled = true;
+                    button.style.background = 'linear-gradient(145deg, #ff4757, #ff3742)';
+                }
+            });
+        }
+
+        // Yangi o'yin
+        newGameButton.addEventListener('click', startGame);
+
+        // O'yinni boshlash
+        animateBackground();
+        startGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2936 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Adventure - Ingliz va Rus Tillarini O'rganish</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff6b6b;
+            --accent2: #ffeb3b;
+            --success: #4caf50;
+            --error: #f44336;
+            --text: #ffffff;
+            --text-light: #a5d6ff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+            overflow-x: hidden;
+            animation: bodyEntrance 1.5s ease-out;
+            transition: background 0.5s ease;
+        }
+
+        body.night-mode {
+            --primary: #2d1b69;
+            --secondary: #1e3a8a;
+            --accent: #e11d48;
+            --accent2: #fbbf24;
+            --text: #ffffff;
+            --text-light: #a5d6ff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 30px;
+            animation: headerSlide 1s ease-out 0.3s both;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0 var(--accent);
+            color: var(--accent2);
+            background: linear-gradient(45deg, #ffeb3b, #ff9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: 1px;
+            animation: titleBounce 2s infinite alternate, titleGlow 3s infinite alternate;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-light);
+            font-weight: 300;
+            animation: subtitleFloat 4s ease-in-out infinite;
+        }
+
+        .game-area {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: gameAreaAppear 1s ease-out 0.5s both;
+        }
+
+        .game-screen {
+            display: none;
+            animation: screenTransition 0.5s ease-out;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .character {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #ffcc00, #ff9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            animation: characterBounce 2s infinite alternate, characterRotate 8s infinite linear;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: characterShine 3s infinite;
+        }
+
+        .profile-picture {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: profilePulse 3s infinite alternate;
+        }
+
+        .profile-picture:hover {
+            transform: scale(1.05);
+            border-color: var(--accent2);
+            animation: profileHover 0.5s ease-out;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            margin: 10px 0 20px;
+            color: var(--accent2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            animation: nameGlow 3s infinite alternate;
+        }
+
+        .profile-name:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .worlds {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .world {
+            width: 170px;
+            height: 170px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            animation: worldFloat 6s ease-in-out infinite;
+        }
+
+        .world:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .world:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .world:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .world:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        .world::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .world>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        .world:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+            animation: worldHover 0.5s ease-out;
+        }
+
+        .world-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3));
+            animation: iconBounce 2s infinite alternate;
+        }
+
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .language-btn {
+            width: 200px;
+            height: 200px;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: bold;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            animation: worldFloat 6s ease-in-out infinite;
+        }
+
+        .language-btn:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+            animation: worldHover 0.5s ease-out;
+        }
+
+        .language-icon {
+            font-size: 5rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3));
+            animation: iconBounce 2s infinite alternate;
+        }
+
+        .english {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .russian {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .forest {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+        }
+
+        .space {
+            background: linear-gradient(135deg, #2196f3, #03a9f4);
+        }
+
+        .ocean {
+            background: linear-gradient(135deg, #00bcd4, #0097a7);
+        }
+
+        .castle {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+        }
+
+        .word-building {
+            background: linear-gradient(135deg, #FF9800, #FF5722);
+        }
+
+        .word-pairs {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+        }
+
+        .picture-words {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        }
+
+        .first-letter {
+            background: linear-gradient(135deg, #2196F3, #03A9F4);
+        }
+
+        .word-match {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+        }
+
+        .picture-words-en {
+            background: linear-gradient(135deg, #2196f3, #03a9f4);
+        }
+
+        .first-letter-en {
+            background: linear-gradient(135deg, #00bcd4, #0097a7);
+        }
+
+        .word-pairs-en {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+        }
+
+        .game-title {
+            font-size: 2.2rem;
+            margin: 20px 0;
+            color: var(--accent2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            animation: titleGlow 3s infinite alternate;
+        }
+
+        .game-description {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: textAppear 1.5s ease-out;
+        }
+
+        .game-content {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: contentSlide 0.8s ease-out;
+        }
+
+        .question {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: var(--accent2);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: questionPulse 3s infinite alternate;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.3rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: optionAppear 0.5s ease-out;
+        }
+
+        .option:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .option:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .option:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .option:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: optionHover 0.5s ease-out;
+        }
+
+        .option:hover::before {
+            transform: translateX(0);
+        }
+
+        .correct {
+            background: var(--success);
+            border-color: var(--success);
+            animation: correctAnswer 0.8s ease-out, confetti 1s ease-out;
+        }
+
+        .incorrect {
+            background: var(--error);
+            border-color: var(--error);
+            animation: incorrectAnswer 0.8s ease-out;
+        }
+
+        .result {
+            font-size: 1.6rem;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            animation: resultAppear 0.5s ease-out;
+        }
+
+        .score {
+            font-size: 1.6rem;
+            margin: 20px 0;
+            color: var(--accent2);
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            animation: scorePulse 2s infinite alternate;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 18px 35px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            animation: btnPulse 3s infinite alternate;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+            animation: btnHover 0.5s ease-out;
+        }
+
+        .btn:hover::before {
+            transform: translateX(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .btn-tertiary {
+            background: linear-gradient(135deg, #a166ab, #5073b8);
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow: hidden;
+            height: 25px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+            animation: progressAppear 1s ease-out;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800);
+            border-radius: 15px;
+            width: 0%;
+            transition: width 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        .achievements {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+
+        .achievement {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: achievementFloat 5s ease-in-out infinite;
+        }
+
+        .achievement:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .achievement:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .achievement:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .achievement:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        .achievement::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.3s;
+        }
+
+        .achievement:hover::before {
+            transform: scale(1);
+        }
+
+        .locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .unlocked {
+            animation: achievementUnlock 0.8s, achievementGlow 2s infinite alternate;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 150px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: statCardAppear 0.8s ease-out;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent2);
+            margin-bottom: 5px;
+            animation: statValuePulse 3s infinite alternate;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.5s ease-out;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: modalSlideUp 0.5s ease-out;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--accent2);
+            text-align: center;
+            animation: titleGlow 3s infinite alternate;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            animation: formGroupAppear 0.5s ease-out;
+        }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            animation: inputAppear 0.5s ease-out;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent2);
+            background: rgba(255, 255, 255, 0.15);
+            animation: inputFocus 0.5s ease-out;
+        }
+
+        .avatar-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .avatar-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            animation: avatarOptionAppear 0.5s ease-out;
+        }
+
+        .avatar-option:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .avatar-option:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .avatar-option:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .avatar-option:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .avatar-option:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .avatar-option:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .avatar-option:hover,
+        .avatar-option.selected {
+            transform: scale(1.1);
+            border-color: var(--accent2);
+            animation: avatarOptionHover 0.5s ease-out;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: var(--text-light);
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            animation: footerAppear 1s ease-out;
+        }
+
+        /* Konfetti animatsiyasi */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0.7;
+            animation: confettiFall 5s linear forwards;
+        }
+
+        /* Control tugmalari */
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Bolalar uchun animatsiyalar */
+        .floating-animals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-animal {
+            position: absolute;
+            font-size: 2rem;
+            animation: floatAround 15s linear infinite;
+        }
+
+        .bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: bubbleRise 10s linear infinite;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        /* Animatsiyalar */
+        @keyframes bodyEntrance {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes headerSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes titleBounce {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(255, 235, 59, 0.8), 0 0 30px rgba(255, 235, 59, 0.6);
+            }
+        }
+
+        @keyframes subtitleFloat {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gameAreaAppear {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes screenTransition {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes characterBounce {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes characterRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes characterShine {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        @keyframes profilePulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes profileHover {
+            0% {
+                transform: scale(1.05);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes nameGlow {
+            0% {
+                text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(255, 235, 59, 0.8);
+            }
+        }
+
+        @keyframes worldFloat {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes worldHover {
+            0% {
+                transform: translateY(-15px) scale(1.05);
+            }
+            50% {
+                transform: translateY(-20px) scale(1.08);
+            }
+            100% {
+                transform: translateY(-15px) scale(1.05);
+            }
+        }
+
+        @keyframes iconBounce {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes textAppear {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes contentSlide {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes questionPulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes optionAppear {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes optionHover {
+            0% {
+                transform: translateY(-5px);
+            }
+            50% {
+                transform: translateY(-7px);
+            }
+            100% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes correctAnswer {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes incorrectAnswer {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+            75% {
+                transform: translateX(-10px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes confetti {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes resultAppear {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes scorePulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes btnPulse {
+            0% {
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            }
+            100% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        @keyframes btnHover {
+            0% {
+                transform: translateY(-7px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(-7px);
+            }
+        }
+
+        @keyframes progressAppear {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes progressShine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes achievementFloat {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes achievementUnlock {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes achievementGlow {
+            0% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+            100% {
+                box-shadow: 0 5px 20px rgba(255, 235, 59, 0.5);
+            }
+        }
+
+        @keyframes statCardAppear {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes statValuePulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes formGroupAppear {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes inputAppear {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes inputFocus {
+            0% {
+                box-shadow: 0 0 0 rgba(255, 235, 59, 0);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 0 rgba(255, 235, 59, 0);
+            }
+        }
+
+        @keyframes avatarOptionAppear {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes avatarOptionHover {
+            0% {
+                transform: scale(1.1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes footerAppear {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Yangi animatsiyalar */
+        @keyframes floatAround {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(100px, 100px) rotate(90deg);
+            }
+            50% {
+                transform: translate(200px, 0) rotate(180deg);
+            }
+            75% {
+                transform: translate(100px, -100px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        @keyframes bubbleRise {
+            0% {
+                transform: translateY(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Media so'rovlar */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            .world {
+                width: 140px;
+                height: 140px;
+            }
+            .language-btn {
+                width: 160px;
+                height: 160px;
+            }
+            .options {
+                grid-template-columns: 1fr;
+            }
+            .game-area {
+                padding: 20px;
+            }
+            .character, .profile-picture {
+                width: 130px;
+                height: 130px;
+            }
+            .character {
+                font-size: 4rem;
+            }
+            .question {
+                font-size: 1.7rem;
+            }
+            .btn {
+                padding: 15px 25px;
+                font-size: 1.1rem;
+            }
+            .controls {
+                top: 10px;
+                right: 10px;
+            }
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .world {
+                width: 120px;
+                height: 120px;
+            }
+            .language-btn {
+                width: 140px;
+                height: 140px;
+            }
+            .world-icon {
+                font-size: 3rem;
+            }
+            .language-icon {
+                font-size: 4rem;
+            }
+            .game-title {
+                font-size: 1.8rem;
+            }
+            .character, .profile-picture {
+                width: 110px;
+                height: 110px;
+            }
+            .character {
+                font-size: 3.5rem;
+            }
+            .stat-card {
+                min-width: 120px;
+                padding: 15px;
+            }
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elementlar -->
+    <audio id="background-music" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-kids-laughing-493.mp3" type="audio/mp3">
+    </audio>
+    <audio id="correct-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mp3">
+    </audio>
+    <audio id="incorrect-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mp3">
+    </audio>
+    <audio id="level-up-sound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- Control tugmalari -->
+    <div class="controls">
+        <button class="control-btn" id="theme-toggle" title="Kechayu kunduz rejimi">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="control-btn" id="music-toggle" title="Musiqa">
+            <i class="fas fa-music"></i>
+        </button>
+        <button class="control-btn" id="sound-toggle" title="Tovush effektlari">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
+
+    <!-- Bolalar uchun animatsiyalar -->
+    <div class="floating-animals" id="floating-animals"></div>
+    <div class="bubbles" id="bubbles"></div>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-book-open"></i> WORD ADVENTURE</h1>
+            <p class="subtitle">Ingliz va Rus Tillarini O'rganishning Qiziqarli Yo'li!</p>
+        </header>
+
+        <div class="game-area">
+            <!-- Til tanlash menyusi -->
+            <div id="language-menu" class="game-screen active">
+                <div class="character">🌍</div>
+                <h2 class="game-title">Tilni Tanlang / Выберите язык</h2>
+                <p class="game-description">O'qimoqchi bo'lgan tilni tanlang. O'zingizga yoqgan dunyolarni kashf eting va yangi so'zlar o'rganing!</p>
+
+                <div class="language-selector">
+                    <div class="language-btn english" onclick="selectLanguage('en')">
+                        <div class="language-icon">EN</div>
+                        <div>English</div>
+                        <div>Ingliz tili</div>
+                    </div>
+                    <div class="language-btn russian" onclick="selectLanguage('ru')">
+                        <div class="language-icon">RU</div>
+                        <div>Russian</div>
+                        <div>Rus tili</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-tertiary" onclick="showScreen('instructions')">
+                    <i class="fas fa-info-circle"></i> Qo'llanma
+                </button>
+            </div>
+
+            <!-- Bosh menyu -->
+            <div id="main-menu" class="game-screen">
+                <div class="character">🧙</div>
+                <h2 class="game-title" id="main-menu-title">Word Adventurega Xush Kelibsiz!</h2>
+                <p class="game-description" id="main-menu-description">Bu o'yinda siz tanlagan tilni qiziqarli dunyolarda sarguzashtlar orqali o'rganasiz. Har bir dunyoda yangi so'zlar va iboralar bilan tanishasiz. Boshlash uchun o'z dunyongizni tanlang!</p>
+
+                <div class="worlds" id="worlds-container">
+                    <!-- JavaScript orqali to'ldiriladi -->
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-points">0</div>
+                        <div class="stat-label">Umumiy Ballar</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="worlds-completed">0</div>
+                        <div class="stat-label">Tugatilgan Dunyolar</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="correct-answers">0</div>
+                        <div class="stat-label">To'g'ri Javoblar</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showScreen('profile')">
+                    <i class="fas fa-user"></i> Profilni Ko'rish
+                </button>
+                <button class="btn btn-secondary" onclick="selectLanguage('change')">
+                    <i class="fas fa-globe"></i> Tilni O'zgartirish
+                </button>
+            </div>
+
+            <!-- Qo'llanma ekrani -->
+            <div id="instructions" class="game-screen">
+                <div class="character">📚</div>
+                <h2 class="game-title">O'yin Qo'llanmasi</h2>
+
+                <div class="game-content">
+                    <div class="game-description" style="text-align: left;">
+                        <h3 style="color: var(--accent2); margin-bottom: 15px;">O'yin Qoidalari:</h3>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px; margin-top: 5px;"></i>
+                                <span>Har bir dunyoda 10 ta savol mavjud</span>
+                            </li>
+                            <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px; margin-top: 5px;"></i>
+                                <span>Har bir to'g'ri javob uchun 10 ball olasiz</span>
+                            </li>
+                            <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px; margin-top: 5px;"></i>
+                                <span>Ballaringizni ko'proq to'plashingiz uchun barcha dunyolarni yakunlang</span>
+                            </li>
+                            <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px; margin-top: 5px;"></i>
+                                <span>Yutuqlarni ochish uchun ballar to'plang</span>
+                            </li>
+                        </ul>
+
+                        <h3 style="color: var(--accent2); margin: 25px 0 15px;">Maslahatlar:</h3>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-lightbulb" style="color: var(--accent2); margin-right: 10px; margin-top: 5px;"></i>
+                                <span>Har bir dunyoni bir necha marta takrorlab, bilimingizni mustahkamlang</span>
+                            </li>
+                            <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-lightbulb" style="color: var(--accent2); margin-right: 10px; margin-top: 5px;"></i>
+                                <span>O'zingizni qiyin topgan so'zlarni yozib oling</span>
+                            </li>
+                            <li style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+                                <i class="fas fa-lightbulb" style="color: var(--accent2); margin-right: 10px; margin-top: 5px;"></i>
+                                <span>Har kuni kamida bitta dunyoni tamomlang</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="goBackFromInstructions()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </button>
+            </div>
+
+            <!-- Profil ekrani -->
+            <div id="profile" class="game-screen">
+                <img id="profile-picture" class="profile-picture" src="https://api.dicebear.com/7.x/adventurer/svg?seed=1" alt="Profil rasmi" onclick="showEditProfileModal()">
+                <div id="profile-name" class="profile-name" onclick="showEditProfileModal()">Ismingiz</div>
+
+                <div class="game-content">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="level">1</div>
+                            <div class="stat-label">Daraja</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="points">0</div>
+                            <div class="stat-label">Ballar</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="streak">0</div>
+                            <div class="stat-label">Ketma-ketlik</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span>Keyingi darajaga</span>
+                        <span id="next-level">30 ball</span>
+                    </div>
+
+                    <h3 style="margin: 25px 0 15px; color: var(--accent2);">Yutuqlaringiz:</h3>
+                    <div class="achievements">
+                        <div class="achievement locked" id="ach1" title="10 ball to'plang">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="achievement locked" id="ach2" title="30 ball to'plang">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="achievement locked" id="ach3" title="Barcha dunyolarni tugating">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="achievement locked" id="ach4" title="100 ball to'plang">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showScreen('main-menu')">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </button>
+                <button class="btn btn-secondary" onclick="startGame()">
+                    <i class="fas fa-play"></i> O'yinni Boshlash
+                </button>
+            </div>
+
+            <!-- O'yin ekrani -->
+            <div id="game" class="game-screen">
+                <div class="character" id="game-character">🐱</div>
+                <h2 class="game-title" id="world-title">Sehrli O'rmon</h2>
+
+                <div class="game-content">
+                    <div class="question" id="question">Bu nima?</div>
+                    <div class="options" id="options">
+                        <!-- JavaScript orqali to'ldiriladi -->
+                    </div>
+                    <div class="result" id="result"></div>
+                    <div class="score" id="game-score">Ball: 0</div>
+                </div>
+
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">
+                    <i class="fas fa-forward"></i> Keyingi Savol
+                </button>
+                <button class="btn btn-secondary" onclick="showScreen('main-menu')">
+                    <i class="fas fa-home"></i> Bosh Menyuga Qaytish
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            Word Adventure - Ingliz va Rus Tillarini O'rganish O'yini &copy; 2025
+        </footer>
+    </div>
+
+    <!-- Profilni tahrirlash modali -->
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Profilni Tahrirlash</h2>
+
+            <div class="form-group">
+                <label for="player-name">Ismingiz:</label>
+                <input type="text" id="player-name" class="form-control" placeholder="Ismingizni kiriting" maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label>Profil rasmi:</label>
+                <div class="avatar-options">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=1" class="avatar-option" onclick="selectAvatar(this, 1)">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=2" class="avatar-option" onclick="selectAvatar(this, 2)">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=3" class="avatar-option" onclick="selectAvatar(this, 3)">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=4" class="avatar-option" onclick="selectAvatar(this, 4)">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=5" class="avatar-option" onclick="selectAvatar(this, 5)">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=6" class="avatar-option" onclick="selectAvatar(this, 6)">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 25px;">
+                <button class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save"></i> Saqlash
+                </button>
+                <button class="btn btn-secondary" onclick="closeEditProfileModal()">
+                    <i class="fas fa-times"></i> Bekor qilish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // O'yin ma'lumotlari
+        const gameData = {
+            currentLanguage: 'en',
+            currentWorld: 'wordMatch',
+            level: 1,
+            points: 0,
+            totalPoints: 0,
+            currentQuestion: 0,
+            correctAnswers: 0,
+            worldsCompleted: 0,
+            streak: 0,
+            playerName: "Ismingiz",
+            playerAvatar: 1,
+            // Sozlamalar
+            nightMode: false,
+            musicEnabled: true,
+            soundEnabled: true,
+            worlds: {
+                en: {
+                    wordMatch: {
+                        name: "Word Match",
+                        icon: "🔤",
+                        character: "🔄",
+                        completed: false,
+                        questions: [
+                            {
+                                word: "APPLE",
+                                scrambled: "",
+                                options: ["APPLE", "ORANGE", "BANANA", "GRAPE"],
+                                correct: 0
+                            },
+                            {
+                                word: "HOUSE",
+                                scrambled: "",
+                                options: ["HOUSE", "CAR", "TREE", "SCHOOL"],
+                                correct: 0
+                            },
+                            {
+                                word: "BOOK",
+                                scrambled: "",
+                                options: ["BOOK", "PEN", "PENCIL", "NOTEBOOK"],
+                                correct: 0
+                            },
+                            {
+                                word: "WATER",
+                                scrambled: "",
+                                options: ["WATER", "FIRE", "EARTH", "AIR"],
+                                correct: 0
+                            },
+                            {
+                                word: "SUN",
+                                scrambled: "",
+                                options: ["SUN", "MOON", "STAR", "PLANET"],
+                                correct: 0
+                            },
+                            {
+                                word: "TREE",
+                                scrambled: "",
+                                options: ["TREE", "FLOWER", "GRASS", "BUSH"],
+                                correct: 0
+                            },
+                            {
+                                word: "CAR",
+                                scrambled: "",
+                                options: ["CAR", "BUS", "TRAIN", "BIKE"],
+                                correct: 0
+                            },
+                            {
+                                word: "DOG",
+                                scrambled: "",
+                                options: ["DOG", "CAT", "BIRD", "FISH"],
+                                correct: 0
+                            },
+                            {
+                                word: "BALL",
+                                scrambled: "",
+                                options: ["BALL", "DOLL", "TOY", "GAME"],
+                                correct: 0
+                            },
+                            {
+                                word: "CAT",
+                                scrambled: "",
+                                options: ["CAT", "DOG", "MOUSE", "HAMSTER"],
+                                correct: 0
+                            }
+                        ]
+                    },
+                    pictureWords: {
+                        name: "Picture Words",
+                        icon: "🖼️",
+                        character: "🎨",
+                        completed: false,
+                        questions: [
+                            {
+                                question: "What is this? 🐱",
+                                options: ["Dog", "Cat", "Bird", "Fish"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? 🍎",
+                                options: ["Banana", "Orange", "Apple", "Grape"],
+                                correct: 2
+                            },
+                            {
+                                question: "What is this? 🏠",
+                                options: ["Car", "House", "Tree", "School"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? 🌳",
+                                options: ["Flower", "Tree", "Grass", "Bush"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? 🚗",
+                                options: ["Bus", "Car", "Train", "Plane"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? 👦",
+                                options: ["Girl", "Boy", "Man", "Woman"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? 📚",
+                                options: ["Notebook", "Book", "Magazine", "Newspaper"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? 🖊️",
+                                options: ["Pencil", "Pen", "Crayon", "Paint"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? 🍕",
+                                options: ["Cake", "Pizza", "Burger", "Sandwich"],
+                                correct: 1
+                            },
+                            {
+                                question: "What is this? ⚽",
+                                options: ["Ball", "Sphere", "Circle", "Round"],
+                                correct: 0
+                            }
+                        ]
+                    },
+                    firstLetter: {
+                        name: "First Letter",
+                        icon: "🔠",
+                        character: "🔍",
+                        completed: false,
+                        questions: [
+                            {
+                                question: "🍎",
+                                options: ["A", "B", "C", "D"],
+                                correct: 0
+                            },
+                            {
+                                question: "🐱",
+                                options: ["C", "D", "E", "F"],
+                                correct: 0
+                            },
+                            {
+                                question: "🏠",
+                                options: ["H", "O", "U", "S"],
+                                correct: 0
+                            },
+                            {
+                                question: "📚",
+                                options: ["B", "C", "D", "E"],
+                                correct: 0
+                            },
+                            {
+                                question: "🚗",
+                                options: ["C", "A", "R", "T"],
+                                correct: 0
+                            },
+                            {
+                                question: "🌳",
+                                options: ["T", "R", "E", "F"],
+                                correct: 0
+                            },
+                            {
+                                question: "👦",
+                                options: ["B", "O", "Y", "G"],
+                                correct: 0
+                            },
+                            {
+                                question: "🍕",
+                                options: ["P", "I", "Z", "A"],
+                                correct: 0
+                            },
+                            {
+                                question: "⚽",
+                                options: ["B", "A", "L", "L"],
+                                correct: 0
+                            },
+                            {
+                                question: "🎮",
+                                options: ["G", "A", "M", "E"],
+                                correct: 0
+                            }
+                        ]
+                    },
+                    wordPairs: {
+                        name: "Word Pairs",
+                        icon: "🔄",
+                        character: "🔗",
+                        completed: false,
+                        questions: [
+                            {
+                                question: "Find the opposite of 'Big'",
+                                options: ["Small", "Large", "Huge", "Giant"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Hot'",
+                                options: ["Cold", "Warm", "Cool", "Boiling"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Fast'",
+                                options: ["Slow", "Quick", "Rapid", "Speedy"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Day'",
+                                options: ["Night", "Morning", "Evening", "Noon"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Light'",
+                                options: ["Dark", "Bright", "Shiny", "Clear"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Up'",
+                                options: ["Down", "Above", "Over", "High"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Happy'",
+                                options: ["Sad", "Joyful", "Glad", "Pleased"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Young'",
+                                options: ["Old", "New", "Fresh", "Recent"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Open'",
+                                options: ["Close", "Unlock", "Free", "Release"],
+                                correct: 0
+                            },
+                            {
+                                question: "Find the opposite of 'Tall'",
+                                options: ["Short", "Long", "High", "Big"],
+                                correct: 0
+                            }
+                        ]
+                    }
+                },
+                ru: {
+                    wordBuilding: {
+                        name: "Слово из букв",
+                        icon: "🔤",
+                        character: "🧩",
+                        completed: false,
+                        questions: [
+                            {
+                                word: "ДОМ",
+                                scrambled: "",
+                                options: ["МОД", "ДОМ", "ОДМ", "МДО"],
+                                correct: 1
+                            },
+                            {
+                                word: "КОТ",
+                                scrambled: "",
+                                options: ["ТОК", "КОТ", "ОКТ", "КТО"],
+                                correct: 1
+                            },
+                            {
+                                word: "МАМА",
+                                scrambled: "",
+                                options: ["АМАМ", "МАМА", "АММА", "МААМ"],
+                                correct: 1
+                            },
+                            {
+                                word: "ШКОЛА",
+                                scrambled: "",
+                                options: ["КОЛАШ", "ШКОЛА", "АЛКОШ", "ЛОШАК"],
+                                correct: 1
+                            },
+                            {
+                                word: "СТОЛ",
+                                scrambled: "",
+                                options: ["ЛОСТ", "СТОЛ", "ТОСЛ", "СЛОТ"],
+                                correct: 1
+                            },
+                            {
+                                word: "РУКА",
+                                scrambled: "",
+                                options: ["АРУК", "РУКА", "КУРА", "АКУР"],
+                                correct: 1
+                            },
+                            {
+                                word: "НОС",
+                                scrambled: "",
+                                options: ["СОН", "НОС", "ОНС", "СНО"],
+                                correct: 1
+                            },
+                            {
+                                word: "ГОРА",
+                                scrambled: "",
+                                options: ["АРОГ", "ГОРА", "РАГО", "ОГРА"],
+                                correct: 1
+                            },
+                            {
+                                word: "РЕКА",
+                                scrambled: "",
+                                options: ["АКЕР", "РЕКА", "КЕРА", "АРЕК"],
+                                correct: 1
+                            },
+                            {
+                                word: "ЛЕТО",
+                                scrambled: "",
+                                options: ["ТЕЛО", "ЛЕТО", "ОТЕЛ", "ТОЛЕ"],
+                                correct: 1
+                            }
+                        ]
+                    },
+                    wordPairs: {
+                        name: "Пары слов",
+                        icon: "🔄",
+                        character: "🔗",
+                        completed: false,
+                        questions: [
+                            {
+                                question: "Найди пару для слова: БОЛЬШОЙ",
+                                options: ["МАЛЕНЬКИЙ", "КРАСИВЫЙ", "ВЫСОКИЙ", "ШИРОКИЙ"],
+                                correct: 0
+                            },
+                            {
+                                question: "Найди пару для слова: ДЕНЬ",
+                                options: ["УТРО", "НОЧЬ", "ВЕЧЕР", "НЕДЕЛЯ"],
+                                correct: 1
+                            },
+                            {
+                                question: "Найди пару для слова: ГОРЯЧИЙ",
+                                options: ["ТЁПЛЫЙ", "ХОЛОДНЫЙ", "ЖАРКИЙ", "КИПЯТОК"],
+                                correct: 1
+                            },
+                            {
+                                question: "Найди пару для слова: БЫСТРО",
+                                options: ["МЕДЛЕННО", "СКОРО", "СРОЧНО", "СЕЙЧАС"],
+                                correct: 0
+                            },
+                            {
+                                question: "Найди пару для слова: ВЕСЁЛЫЙ",
+                                options: ["ГРУСТНЫЙ", "РАДОСТНЫЙ", "СЧАСТЛИВЫЙ", "СМЕШНОЙ"],
+                                correct: 0
+                            },
+                            {
+                                question: "Найди пару для слова: ВВЕРХ",
+                                options: ["НИЗ", "ВНИЗ", "ПРАВО", "ЛЕВО"],
+                                correct: 1
+                            },
+                            {
+                                question: "Найди пару для слова: ДАЛЕКО",
+                                options: ["БЛИЗКО", "ДАЛЁКИЙ", "РЯДОМ", "ЗДЕСЬ"],
+                                correct: 0
+                            },
+                            {
+                                question: "Найди пару для слова: СВЕТ",
+                                options: ["ТЕМНОТА", "ТЬМА", "НОЧЬ", "ТЁМНЫЙ"],
+                                correct: 1
+                            },
+                            {
+                                question: "Найди пару для слова: ТВЁРДЫЙ",
+                                options: ["МЯГКИЙ", "КРЕПКИЙ", "ПРОЧНЫЙ", "ЖЁСТКИЙ"],
+                                correct: 0
+                            },
+                            {
+                                question: "Найди пару для слова: СТАРЫЙ",
+                                options: ["НОВЫЙ", "МОЛОДОЙ", "ДРЕВНИЙ", "ВЗРОСЛЫЙ"],
+                                correct: 1
+                            }
+                        ]
+                    },
+                    pictureWords: {
+                        name: "Опиши предмет",
+                        icon: "🖼️",
+                        character: "🎨",
+                        completed: false,
+                        questions: [
+                            {
+                                question: "Что это? 🐱",
+                                options: ["СОБАКА", "КОТ", "ПТИЦА", "РЫБА"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? 🍎",
+                                options: ["БАНАН", "АПЕЛЬСИН", "ЯБЛОКО", "ВИНОГРАД"],
+                                correct: 2
+                            },
+                            {
+                                question: "Что это? 🏠",
+                                options: ["МАШИНА", "ДОМ", "ДЕРЕВО", "ШКОЛА"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? 🌳",
+                                options: ["ЦВЕТОК", "ДЕРЕВО", "ТРАВА", "КУСТ"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? 🚗",
+                                options: ["АВТОБУС", "МАШИНА", "ПОЕЗД", "САМОЛЁТ"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? 👦",
+                                options: ["ДЕВОЧКА", "МАЛЬЧИК", "МУЖЧИНА", "ЖЕНЩИНА"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? 📚",
+                                options: ["ТЕТРАДЬ", "КНИГА", "ЖУРНАЛ", "ГАЗЕТА"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? 🖊️",
+                                options: ["КАРАНДАШ", "РУЧКА", "МЕЛ", "КРАСКА"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? 🍕",
+                                options: ["ТОРТ", "ПИЦЦА", "БУРГЕР", "СЭНДВИЧ"],
+                                correct: 1
+                            },
+                            {
+                                question: "Что это? ⚽",
+                                options: ["МЯЧ", "ШАР", "КОЛЬЦО", "КУБ"],
+                                correct: 0
+                            }
+                        ]
+                    },
+                    firstLetter: {
+                        name: "Первая буква",
+                        icon: "🔠",
+                        character: "🔍",
+                        completed: false,
+                        questions: [
+                            {
+                                question: "🍎",
+                                options: ["А", "Я", "Б", "О"],
+                                correct: 1
+                            },
+                            {
+                                question: "🐱",
+                                options: ["К", "О", "Т", "М"],
+                                correct: 0
+                            },
+                            {
+                                question: "🏠",
+                                options: ["Д", "О", "М", "Ы"],
+                                correct: 0
+                            },
+                            {
+                                question: "📚",
+                                options: ["К", "Н", "И", "Г"],
+                                correct: 0
+                            },
+                            {
+                                question: "🚗",
+                                options: ["М", "А", "Ш", "И"],
+                                correct: 2
+                            },
+                            {
+                                question: "🌳",
+                                options: ["Д", "Е", "Р", "В"],
+                                correct: 0
+                            },
+                            {
+                                question: "👦",
+                                options: ["М", "А", "Л", "Ь"],
+                                correct: 2
+                            },
+                            {
+                                question: "🍕",
+                                options: ["П", "И", "Ц", "Ц"],
+                                correct: 0
+                            },
+                            {
+                                question: "⚽",
+                                options: ["М", "Я", "Ч", "Ш"],
+                                correct: 2
+                            },
+                            {
+                                question: "🎮",
+                                options: ["И", "Г", "Р", "А"],
+                                correct: 1
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Audio elementlari
+        const backgroundMusic = document.getElementById('background-music');
+        const correctSound = document.getElementById('correct-sound');
+        const incorrectSound = document.getElementById('incorrect-sound');
+        const levelUpSound = document.getElementById('level-up-sound');
+
+        // So'zlarni aralashtirish funksiyasi
+        function scrambleWord(word) {
+            const letters = word.split('');
+            for (let i = letters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [letters[i], letters[j]] = [letters[j], letters[i]];
+            }
+            return letters.join('');
+        }
+
+        // Ma'lumotlarni localStorage dan o'qish
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('wordAdventureData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                
+                // Profil ma'lumotlarini yangilash
+                if (parsedData.playerName) gameData.playerName = parsedData.playerName;
+                if (parsedData.playerAvatar) gameData.playerAvatar = parsedData.playerAvatar;
+                
+                // O'yin ma'lumotlarini yangilash
+                if (parsedData.level) gameData.level = parsedData.level;
+                if (parsedData.points) gameData.points = parsedData.points;
+                if (parsedData.totalPoints) gameData.totalPoints = parsedData.totalPoints;
+                if (parsedData.correctAnswers) gameData.correctAnswers = parsedData.correctAnswers;
+                if (parsedData.worldsCompleted) gameData.worldsCompleted = parsedData.worldsCompleted;
+                if (parsedData.streak) gameData.streak = parsedData.streak;
+                
+                // Dunyolarning holatini yangilash
+                if (parsedData.worlds) {
+                    for (const lang in parsedData.worlds) {
+                        if (gameData.worlds[lang]) {
+                            for (const world in parsedData.worlds[lang]) {
+                                if (gameData.worlds[lang][world]) {
+                                    gameData.worlds[lang][world].completed = parsedData.worlds[lang][world].completed;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Sozlamalarni yangilash
+                if (parsedData.nightMode !== undefined) gameData.nightMode = parsedData.nightMode;
+                if (parsedData.musicEnabled !== undefined) gameData.musicEnabled = parsedData.musicEnabled;
+                if (parsedData.soundEnabled !== undefined) gameData.soundEnabled = parsedData.soundEnabled;
+            }
+        }
+
+        // Ma'lumotlarni localStorage ga saqlash
+        function saveToLocalStorage() {
+            const dataToSave = {
+                playerName: gameData.playerName,
+                playerAvatar: gameData.playerAvatar,
+                level: gameData.level,
+                points: gameData.points,
+                totalPoints: gameData.totalPoints,
+                correctAnswers: gameData.correctAnswers,
+                worldsCompleted: gameData.worldsCompleted,
+                streak: gameData.streak,
+                worlds: {},
+                nightMode: gameData.nightMode,
+                musicEnabled: gameData.musicEnabled,
+                soundEnabled: gameData.soundEnabled
+            };
+            
+            // Dunyolarning holatini saqlash
+            for (const lang in gameData.worlds) {
+                dataToSave.worlds[lang] = {};
+                for (const world in gameData.worlds[lang]) {
+                    dataToSave.worlds[lang][world] = {
+                        completed: gameData.worlds[lang][world].completed
+                    };
+                }
+            }
+            
+            localStorage.setItem('wordAdventureData', JSON.stringify(dataToSave));
+        }
+
+        // Sahifalarni ko'rsatish funksiyasi
+        function showScreen(screenId) {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+
+            // Agar asosiy menyu ko'rsatilsa, statistikani yangilash
+            if (screenId === 'main-menu') {
+                updateStats();
+            }
+        }
+
+        // Tilni tanlash
+        function selectLanguage(language) {
+            if (language === 'change') {
+                showScreen('language-menu');
+                return;
+            }
+
+            gameData.currentLanguage = language;
+
+            // Dunyolarni yangilash
+            updateWorldsForLanguage();
+
+            // Bosh menyu sarlavhasini yangilash
+            if (language === 'en') {
+                document.getElementById('main-menu-title').textContent = "Word Adventurega Xush Kelibsiz!";
+                document.getElementById('main-menu-description').textContent = "Bu o'yinda siz ingliz tilini qiziqarli dunyolarda sarguzashtlar orqali o'rganasiz. Har bir dunyoda yangi so'zlar va iboralar bilan tanishasiz. Boshlash uchun o'z dunyongizni tanlang!";
+            } else if (language === 'ru') {
+                document.getElementById('main-menu-title').textContent = "Добро пожаловать в Word Adventure!";
+                document.getElementById('main-menu-description').textContent = "В этой игре вы изучаете русский язык через увлекательные приключения в разных мирах. В каждом мире вы познакомитесь с новыми словами и выражениями. Выберите свой мир, чтобы начать!";
+            }
+
+            showScreen('main-menu');
+        }
+
+        // Tanlangan til uchun dunyolarni yangilash
+        function updateWorldsForLanguage() {
+            const worldsContainer = document.getElementById('worlds-container');
+            worldsContainer.innerHTML = '';
+
+            const languageWorlds = gameData.worlds[gameData.currentLanguage];
+
+            for (const worldKey in languageWorlds) {
+                const world = languageWorlds[worldKey];
+                const worldElement = document.createElement('div');
+                worldElement.className = `world ${worldKey}`;
+                worldElement.onclick = () => selectWorld(worldKey);
+                worldElement.innerHTML = `
+                    <div class="world-icon">${world.icon}</div>
+                    <div>${world.name}</div>
+                `;
+                worldsContainer.appendChild(worldElement);
+            }
+        }
+
+        // Profilni tahrirlash modali
+        function showEditProfileModal() {
+            document.getElementById('edit-profile-modal').style.display = 'flex';
+            document.getElementById('player-name').value = gameData.playerName;
+
+            // Avatarlarni tanlash
+            const avatars = document.querySelectorAll('.avatar-option');
+            avatars.forEach(avatar => {
+                avatar.classList.remove('selected');
+                if (parseInt(avatar.getAttribute('src').split('seed=')[1]) === gameData.playerAvatar) {
+                    avatar.classList.add('selected');
+                }
+            });
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('edit-profile-modal').style.display = 'none';
+        }
+
+        function selectAvatar(element, avatarId) {
+            const avatars = document.querySelectorAll('.avatar-option');
+            avatars.forEach(avatar => avatar.classList.remove('selected'));
+            element.classList.add('selected');
+            gameData.playerAvatar = avatarId;
+        }
+
+        function saveProfile() {
+            const nameInput = document.getElementById('player-name');
+            if (nameInput.value.trim() !== '') {
+                gameData.playerName = nameInput.value.trim();
+                updateProfileDisplay();
+                saveToLocalStorage();
+            }
+            closeEditProfileModal();
+        }
+
+        function updateProfileDisplay() {
+            document.getElementById('profile-name').textContent = gameData.playerName;
+            document.getElementById('profile-picture').src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${gameData.playerAvatar}`;
+        }
+
+        // Dunyoni tanlash
+        function selectWorld(world) {
+            gameData.currentWorld = world;
+            const worldData = gameData.worlds[gameData.currentLanguage][world];
+            document.getElementById('world-title').textContent = worldData.name;
+            document.getElementById('game-character').textContent = worldData.character;
+
+            // Dunyoni tanlash animatsiyasi
+            const selectedWorld = document.querySelector(`.world.${world}`);
+            selectedWorld.style.animation = 'worldSelect 0.5s ease-out';
+
+            setTimeout(() => {
+                selectedWorld.style.animation = '';
+            }, 500);
+
+            // O'yinni boshlash
+            setTimeout(() => {
+                startGame();
+            }, 800);
+        }
+
+        // O'yinni boshlash
+        function startGame() {
+            gameData.currentQuestion = 0;
+            gameData.points = 0;
+            updateGameScore();
+            showQuestion();
+            showScreen('game');
+
+            // O'yin ekraniga kirish animatsiyasi
+            const gameScreen = document.getElementById('game');
+            gameScreen.style.animation = 'gameStart 1s ease-out';
+        }
+
+        // Savolni ko'rsatish
+        function showQuestion() {
+            const world = gameData.worlds[gameData.currentLanguage][gameData.currentWorld];
+            const question = world.questions[gameData.currentQuestion];
+
+            // Agar bu "Word Match" yoki "Word Building" bo'lsa, so'zlarni aralashtirish
+            if (gameData.currentWorld === 'wordMatch' || gameData.currentWorld === 'wordBuilding') {
+                // Asl so'zni saqlash
+                const originalWord = question.word;
+                
+                // So'zni aralashtirish
+                let scrambledWord;
+                do {
+                    scrambledWord = scrambleWord(originalWord);
+                } while (scrambledWord === originalWord); // So'z o'ziga teng bo'lmasligi uchun
+                
+                // Savolni yangilash
+                document.getElementById('question').textContent = 
+                    gameData.currentLanguage === 'en' 
+                    ? `Unscramble the word: ${scrambledWord}` 
+                    : `Собери слово из букв: ${scrambledWord.split('').join(', ')}`;
+                
+                // Variantlarni aralashtirish
+                const currentOptions = [...question.options];
+                const correctAnswer = currentOptions[question.correct];
+                
+                for (let i = currentOptions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [currentOptions[i], currentOptions[j]] = [currentOptions[j], currentOptions[i]];
+                }
+                
+                // Yangi to'g'ri javob indeksini topish
+                const newCorrectIndex = currentOptions.indexOf(correctAnswer);
+                
+                // Yangilangan ma'lumotlarni saqlash
+                question.scrambled = scrambledWord;
+                question.options = currentOptions;
+                question.correct = newCorrectIndex;
+            } else {
+                // Boshqa o'yinlar uchun oddiy savol
+                document.getElementById('question').textContent = question.question;
+            }
+
+            document.getElementById('result').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+
+            // Savol ko'rsatish animatsiyasi
+            document.getElementById('question').style.animation = 'questionAppear 0.8s ease-out';
+        }
+
+        // Javobni tekshirish
+        function checkAnswer(selectedIndex) {
+            const world = gameData.worlds[gameData.currentLanguage][gameData.currentWorld];
+            const question = world.questions[gameData.currentQuestion];
+            const options = document.querySelectorAll('.option');
+
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+                option.onclick = null; // Boshqa javoblarni tanlashni cheklash
+            });
+
+            if (selectedIndex === question.correct) {
+                document.getElementById('result').textContent = gameData.currentLanguage === 'en' ? "To'g'ri! Ajoyib! 🎉" : "Правильно! Отлично! 🎉";
+                document.getElementById('result').style.background = "rgba(76, 175, 80, 0.3)";
+                gameData.points += 10;
+                gameData.totalPoints += 10;
+                gameData.correctAnswers++;
+                gameData.streak++;
+                updateGameScore();
+                updateProfile();
+                saveToLocalStorage();
+
+                // Konfetti animatsiyasi
+                createConfetti();
+
+                // To'g'ri javob tovushi
+                if (gameData.soundEnabled) {
+                    correctSound.currentTime = 0;
+                    correctSound.play();
+                }
+            } else {
+                document.getElementById('result').textContent = gameData.currentLanguage === 'en' ? "Noto'g'ri. Keyingi safar urinib ko'ring!" : "Неправильно. Попробуйте в следующий раз!";
+                document.getElementById('result').style.background = "rgba(244, 67, 54, 0.3)";
+                gameData.streak = 0;
+                saveToLocalStorage();
+
+                // Noto'g'ri javob tovushi
+                if (gameData.soundEnabled) {
+                    incorrectSound.currentTime = 0;
+                    incorrectSound.play();
+                }
+            }
+
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.animation = 'buttonPulse 1s infinite';
+        }
+
+        // Konfetti animatsiyasi
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const container = document.querySelector('.game-content');
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        // Keyingi savol
+        function nextQuestion() {
+            const world = gameData.worlds[gameData.currentLanguage][gameData.currentWorld];
+            gameData.currentQuestion++;
+
+            if (gameData.currentQuestion < world.questions.length) {
+                showQuestion();
+            } else {
+                // Dunyo tugadi
+                document.getElementById('result').textContent = gameData.currentLanguage === 'en'
+                    ? `Tabriklaymiz! Siz ${world.name} dunyosini tugatdingiz va ${gameData.points} ball to'pladingiz!`
+                    : `Поздравляем! Вы завершили мир ${world.name} и набрали ${gameData.points} баллов!`;
+                document.getElementById('result').style.background = "rgba(255, 235, 59, 0.3)";
+                document.getElementById('next-btn').style.display = 'none';
+
+                // Dunyoni tugatilgan deb belgilash
+                if (!world.completed) {
+                    world.completed = true;
+                    gameData.worldsCompleted++;
+                    saveToLocalStorage();
+
+                    // Katta konfetti animatsiyasi
+                    createConfetti();
+                    createConfetti();
+
+                    // Daraja oshirish tovushi
+                    if (gameData.soundEnabled) {
+                        levelUpSound.currentTime = 0;
+                        levelUpSound.play();
+                    }
+                }
+
+                // Yutuqlarni yangilash
+                checkAchievements();
+            }
+        }
+
+        // O'yin ballarini yangilash
+        function updateGameScore() {
+            document.getElementById('game-score').textContent = gameData.currentLanguage === 'en'
+                ? `Ball: ${gameData.points}`
+                : `Баллы: ${gameData.points}`;
+        }
+
+        // Profilni yangilash
+        function updateProfile() {
+            document.getElementById('points').textContent = gameData.points;
+            document.getElementById('streak').textContent = gameData.streak;
+
+            // Darajani yangilash
+            if (gameData.totalPoints >= 100) {
+                gameData.level = 4;
+                document.getElementById('next-level').textContent = gameData.currentLanguage === 'en' ? "Maksimal" : "Максимум";
+            } else if (gameData.totalPoints >= 60) {
+                gameData.level = 3;
+                document.getElementById('next-level').textContent = gameData.currentLanguage === 'en' ? "100 ball" : "100 баллов";
+            } else if (gameData.totalPoints >= 30) {
+                gameData.level = 2;
+                document.getElementById('next-level').textContent = gameData.currentLanguage === 'en' ? "60 ball" : "60 баллов";
+            } else {
+                gameData.level = 1;
+                document.getElementById('next-level').textContent = gameData.currentLanguage === 'en' ? "30 ball" : "30 баллов";
+            }
+
+            document.getElementById('level').textContent = gameData.level;
+
+            // Progress barni yangilash
+            let progress;
+            if (gameData.level === 1) {
+                progress = (gameData.totalPoints / 30) * 100;
+            } else if (gameData.level === 2) {
+                progress = ((gameData.totalPoints - 30) / 30) * 100;
+            } else if (gameData.level === 3) {
+                progress = ((gameData.totalPoints - 60) / 40) * 100;
+            } else {
+                progress = 100;
+            }
+
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        // Statistikani yangilash
+        function updateStats() {
+            document.getElementById('total-points').textContent = gameData.totalPoints;
+            document.getElementById('worlds-completed').textContent = gameData.worldsCompleted;
+            document.getElementById('correct-answers').textContent = gameData.correctAnswers;
+        }
+
+        // Yutuqlarni tekshirish
+        function checkAchievements() {
+            // 10 ball yutug'i
+            if (gameData.totalPoints >= 10) {
+                const ach1 = document.getElementById('ach1');
+                if (ach1.classList.contains('locked')) {
+                    ach1.classList.remove('locked');
+                    ach1.classList.add('unlocked');
+                    setTimeout(() => {
+                        ach1.classList.remove('unlocked');
+                    }, 800);
+                }
+            }
+
+            // 30 ball yutug'i
+            if (gameData.totalPoints >= 30) {
+                const ach2 = document.getElementById('ach2');
+                if (ach2.classList.contains('locked')) {
+                    ach2.classList.remove('locked');
+                    ach2.classList.add('unlocked');
+                    setTimeout(() => {
+                        ach2.classList.remove('unlocked');
+                    }, 800);
+                }
+            }
+
+            // Barcha dunyolarni tugatish yutug'i
+            if (gameData.worldsCompleted >= Object.keys(gameData.worlds[gameData.currentLanguage]).length) {
+                const ach3 = document.getElementById('ach3');
+                if (ach3.classList.contains('locked')) {
+                    ach3.classList.remove('locked');
+                    ach3.classList.add('unlocked');
+                    setTimeout(() => {
+                        ach3.classList.remove('unlocked');
+                    }, 800);
+                }
+            }
+
+            // 100 ball yutug'i
+            if (gameData.totalPoints >= 100) {
+                const ach4 = document.getElementById('ach4');
+                if (ach4.classList.contains('locked')) {
+                    ach4.classList.remove('locked');
+                    ach4.classList.add('unlocked');
+                    setTimeout(() => {
+                        ach4.classList.remove('unlocked');
+                    }, 800);
+                }
+            }
+        }
+
+        // Qo'llanmadan orqaga qaytish
+        function goBackFromInstructions() {
+            if (document.getElementById('language-menu').classList.contains('active')) {
+                showScreen('language-menu');
+            } else {
+                showScreen('main-menu');
+            }
+        }
+
+        // Kechayu kunduz rejimi
+        function toggleNightMode() {
+            gameData.nightMode = !gameData.nightMode;
+            document.body.classList.toggle('night-mode', gameData.nightMode);
+            const themeIcon = document.getElementById('theme-toggle').querySelector('i');
+            themeIcon.className = gameData.nightMode ? 'fas fa-sun' : 'fas fa-moon';
+            saveToLocalStorage();
+
+            // Animatsiyalarni yangilash
+            if (gameData.nightMode) {
+                createStars();
+            } else {
+                document.getElementById('stars').innerHTML = '';
+            }
+        }
+
+        // Musiqa boshqaruvi
+        function toggleMusic() {
+            gameData.musicEnabled = !gameData.musicEnabled;
+            const musicIcon = document.getElementById('music-toggle').querySelector('i');
+
+            if (gameData.musicEnabled) {
+                backgroundMusic.play().catch(e => console.log("Musiqa boshlanishi kutilyapti..."));
+                musicIcon.className = 'fas fa-music';
+            } else {
+                backgroundMusic.pause();
+                musicIcon.className = 'fas fa-music-slash';
+            }
+            saveToLocalStorage();
+        }
+
+        // Tovush effektlari
+        function toggleSound() {
+            gameData.soundEnabled = !gameData.soundEnabled;
+            const soundIcon = document.getElementById('sound-toggle').querySelector('i');
+            soundIcon.className = gameData.soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+            saveToLocalStorage();
+        }
+
+        // Bolalar uchun animatsiyalar
+        function createFloatingAnimals() {
+            const animalsContainer = document.getElementById('floating-animals');
+            const animals = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵'];
+
+            for (let i = 0; i < 10; i++) {
+                const animal = document.createElement('div');
+                animal.className = 'floating-animal';
+                animal.textContent = animals[Math.floor(Math.random() * animals.length)];
+                animal.style.left = Math.random() * 100 + '%';
+                animal.style.top = Math.random() * 100 + '%';
+                animal.style.animationDelay = Math.random() * 15 + 's';
+                animal.style.fontSize = (Math.random() * 2 + 1.5) + 'rem';
+                animalsContainer.appendChild(animal);
+            }
+        }
+
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles');
+
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.width = (Math.random() * 30 + 20) + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.animationDelay = Math.random() * 10 + 's';
+                bubble.style.opacity = Math.random() * 0.5 + 0.2;
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = (Math.random() * 3 + 2) + 'px';
+                star.style.height = star.style.width;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Dastlabki sozlamalar
+        window.onload = function () {
+            // LocalStorage dan ma'lumotlarni yuklash
+            loadFromLocalStorage();
+            
+            // Kechayu kunduz rejimini sozlash
+            document.body.classList.toggle('night-mode', gameData.nightMode);
+            const themeIcon = document.getElementById('theme-toggle').querySelector('i');
+            themeIcon.className = gameData.nightMode ? 'fas fa-sun' : 'fas fa-moon';
+            
+            // Musiqa va tovush sozlamalarini sozlash
+            const musicIcon = document.getElementById('music-toggle').querySelector('i');
+            musicIcon.className = gameData.musicEnabled ? 'fas fa-music' : 'fas fa-music-slash';
+            
+            const soundIcon = document.getElementById('sound-toggle').querySelector('i');
+            soundIcon.className = gameData.soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+            
+            // Musiqani boshlash
+            if (gameData.musicEnabled) {
+                backgroundMusic.play().catch(e => console.log("Musiqa boshlanishi kutilyapti..."));
+            }
+            
+            updateProfileDisplay();
+            updateProfile();
+            updateStats();
+            updateWorldsForLanguage();
+
+            // Animatsiyalarni yaratish
+            createFloatingAnimals();
+            createBubbles();
+            if (gameData.nightMode) {
+                createStars();
+            }
+
+            // Control tugmalarini sozlash
+            document.getElementById('theme-toggle').addEventListener('click', toggleNightMode);
+            document.getElementById('music-toggle').addEventListener('click', toggleMusic);
+            document.getElementById('sound-toggle').addEventListener('click', toggleSound);
+        };
+
+        // Yangi animatsiyalar qo'shildi
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes worldSelect {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
+            
+            @keyframes gameStart {
+                0% { transform: translateY(100px); opacity: 0; }
+                100% { transform: translateY(0); opacity: 1; }
+            }
+            
+            @keyframes questionAppear {
+                0% { transform: scale(0.8); opacity: 0; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+            
+            @keyframes buttonPulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+            
+            @keyframes confettiFall {
+                0% {
+                    transform: translateY(-100px) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(500px) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

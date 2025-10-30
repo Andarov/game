@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bolalar Matematika O'yini</title>
+  <style>
+    * {
+      user-select: none;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chilanka', cursive, sans-serif;
+      background: linear-gradient(135deg, #ff9ed8 0%, #a2e2ff 50%, #9dff9d 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      z-index: -1;
+    }
+
+    .cloud-1 {
+      width: 120px;
+      height: 60px;
+      top: 10%;
+      left: 5%;
+      animation: float 20s infinite linear;
+    }
+
+    .cloud-2 {
+      width: 150px;
+      height: 75px;
+      top: 25%;
+      right: 8%;
+      animation: float 25s infinite linear reverse;
+    }
+
+    .cloud-3 {
+      width: 100px;
+      height: 50px;
+      bottom: 15%;
+      left: 15%;
+      animation: float 18s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateX(-20px); }
+      50% { transform: translateX(20px); }
+      100% { transform: translateX(-20px); }
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      color: #ff2e63;
+      text-shadow: 3px 3px #ffde59;
+      margin-bottom: 20px;
+      animation: rainbow 4s infinite alternate;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 15px 30px;
+      border-radius: 50px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    @keyframes rainbow {
+      0% { color: #ff2e63; }
+      25% { color: #ff9a3c; }
+      50% { color: #ffde59; }
+      75% { color: #3ca6ff; }
+      100% { color: #9d4edd; }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 500px;
+      animation: pop 0.5s ease;
+      border: 5px solid #ff9a3c;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .welcome-text {
+      font-size: 2.2rem;
+      color: #3a0ca3;
+      margin: 20px 0 30px 0;
+      background: linear-gradient(45deg, #ffde59, #ff9a3c);
+      border-radius: 20px;
+      padding: 15px 30px;
+      display: inline-block;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      border: 4px solid #ff2e63;
+      font-weight: bold;
+    }
+
+    #numberDisplay {
+      font-size: 5rem;
+      color: #3a0ca3;
+      margin: 25px 0;
+      animation: bounce 1.2s infinite alternate;
+      background: linear-gradient(45deg, #ffde59, #ff9a3c);
+      border-radius: 20px;
+      padding: 20px;
+      display: inline-block;
+      min-width: 160px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      border: 4px solid #ff2e63;
+      font-weight: bold;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-10px) scale(1.05); }
+    }
+
+    button {
+      background: linear-gradient(45deg, #ff9a3c, #ff2e63);
+      border: none;
+      border-radius: 20px;
+      padding: 15px 30px;
+      font-size: 1.4rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 10px 0;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      font-weight: bold;
+      display: block;
+      width: 100%;
+      max-width: 280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(45deg, #ffde59, #ff9a3c);
+      color: #3a0ca3;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .character {
+      position: absolute;
+      font-size: 2.5rem;
+      z-index: -1;
+      animation: floatCharacter 15s infinite linear;
+    }
+
+    .character-1 {
+      top: 10%;
+      right: 5%;
+      animation-delay: 0s;
+    }
+
+    .character-2 {
+      bottom: 15%;
+      left: 5%;
+      animation-delay: 5s;
+    }
+
+    .character-3 {
+      top: 40%;
+      left: 3%;
+      animation-delay: 10s;
+    }
+
+    @keyframes floatCharacter {
+      0% { transform: translateY(0) rotate(0); }
+      25% { transform: translateY(-15px) rotate(5deg); }
+      50% { transform: translateY(0) rotate(0); }
+      75% { transform: translateY(15px) rotate(-5deg); }
+      100% { transform: translateY(0) rotate(0); }
+    }
+
+    .score {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ff2e63;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border: 2px solid #ff9a3c;
+    }
+
+    .result-message {
+      font-size: 1.8rem;
+      color: #3a0ca3;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 3px solid #ff9a3c;
+    }
+
+    .input-container {
+      margin: 20px 0;
+    }
+
+    #answerInput {
+      font-size: 2rem;
+      padding: 15px;
+      width: 150px;
+      text-align: center;
+      border: 4px solid #ff9a3c;
+      border-radius: 15px;
+      background: #fff;
+      color: #3a0ca3;
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    #answerInput:focus {
+      border-color: #ff2e63;
+      box-shadow: 0 0 10px rgba(255, 46, 99, 0.5);
+    }
+
+    .submit-btn {
+      background: linear-gradient(45deg, #3ca6ff, #9d4edd) !important;
+      margin-top: 15px !important;
+    }
+
+    /* Yuz shaklidagi qiyinlik tanlash */
+    .difficulty-selection {
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .difficulty-title {
+      font-size: 1.5rem;
+      color: #3a0ca3;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 10px 20px;
+      border-radius: 15px;
+      border: 2px solid #ff9a3c;
+    }
+
+    .face-container {
+      position: relative;
+      width: 350px;
+      height: 350px;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Yuz aylanası */
+    .face-container::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(45deg, #ffde59, #ff9a3c);
+      border-radius: 50%;
+      z-index: -1;
+      border: 5px solid #ff2e63;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      top: 25px;
+    }
+
+    /* 3 ta Ko'z */
+    .eyes {
+      display: flex;
+      justify-content: space-between;
+      width: 280px;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+      margin-top: 40px;
+    }
+
+    .eye-btn {
+      width: 80px !important;
+      height: 80px;
+      border-radius: 50% !important;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(45deg, #3ca6ff, #9d4edd) !important;
+      border: 3px solid #3a0ca3 !important;
+      padding: 10px !important;
+      margin: 0 !important;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+
+    .eye-btn:hover {
+      transform: scale(1.1) !important;
+      background: linear-gradient(45deg, #ffde59, #ff9a3c) !important;
+      border-color: #ff2e63 !important;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    /* Og'iz */
+    .mouth-container {
+      position: relative;
+      z-index: 2;
+      margin-top: 20px;
+    }
+
+    .mouth {
+      width: 220px;
+      height: 80px;
+      background: linear-gradient(45deg, #ff2e63, #ff9a3c);
+      border-radius: 50px 50px 100px 100px;
+      border: 3px solid #3a0ca3;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: mouthPulse 3s infinite alternate;
+    }
+
+    @keyframes mouthPulse {
+      from { 
+        transform: scale(1);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      }
+      to { 
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      }
+    }
+
+    .mouth-text {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      z-index: 2;
+      position: relative;
+    }
+
+    /* 1-999 SONLARI ANIMATSIYASI */
+    .numbers-flow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 50px 50px 100px 100px;
+      z-index: 1;
+    }
+
+    .number-bubble {
+      position: absolute;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      animation: floatUp 6s infinite linear;
+      z-index: 1;
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(80px) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-40px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .difficulty-name {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 3px;
+      color: white;
+    }
+
+    .difficulty-info {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-style: italic;
+    }
+
+    .selected-difficulty {
+      background: linear-gradient(45deg, #ffde59, #ff9a3c) !important;
+      color: #3a0ca3 !important;
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+      border: 3px solid #ff2e63 !important;
+    }
+
+    .selected-difficulty .difficulty-name {
+      color: #3a0ca3 !important;
+    }
+
+    .selected-difficulty .difficulty-info {
+      color: rgba(58, 12, 163, 0.8) !important;
+    }
+
+    /* Kichik ekranlar uchun moslashtirish */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+        padding: 12px 25px;
+      }
+      
+      .container {
+        padding: 20px;
+        max-width: 90%;
+      }
+      
+      .welcome-text {
+        font-size: 1.8rem;
+        padding: 12px 25px;
+      }
+      
+      #numberDisplay {
+        font-size: 3.5rem;
+        padding: 15px;
+        min-width: 120px;
+      }
+      
+      button {
+        font-size: 1.2rem;
+        padding: 12px 25px;
+        max-width: 240px;
+      }
+      
+      .face-container {
+        width: 300px;
+        height: 300px;
+      }
+      
+      .face-container::before {
+        width: 250px;
+        height: 250px;
+        top: 20px;
+      }
+      
+      .eyes {
+        width: 240px;
+        margin-bottom: 30px;
+        margin-top: 30px;
+      }
+      
+      .eye-btn {
+        width: 70px !important;
+        height: 70px;
+      }
+      
+      .mouth {
+        width: 180px;
+        height: 70px;
+      }
+      
+      .mouth-text {
+        font-size: 1rem;
+      }
+      
+      .number-bubble {
+        font-size: 0.8rem;
+      }
+      
+      .difficulty-title {
+        font-size: 1.3rem;
+      }
+      
+      .difficulty-name {
+        font-size: 0.9rem;
+      }
+      
+      .difficulty-info {
+        font-size: 0.65rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .welcome-text {
+        font-size: 1.5rem;
+        padding: 10px 20px;
+      }
+      
+      #numberDisplay {
+        font-size: 3rem;
+      }
+      
+      button {
+        font-size: 1.1rem;
+        padding: 10px 20px;
+        max-width: 200px;
+      }
+      
+      #answerInput {
+        font-size: 1.5rem;
+        width: 100px;
+      }
+      
+      .face-container {
+        width: 260px;
+        height: 260px;
+      }
+      
+      .face-container::before {
+        width: 220px;
+        height: 220px;
+        top: 15px;
+      }
+      
+      .eyes {
+        width: 200px;
+        margin-bottom: 25px;
+        margin-top: 25px;
+      }
+      
+      .eye-btn {
+        width: 60px !important;
+        height: 60px;
+      }
+      
+      .mouth {
+        width: 150px;
+        height: 60px;
+      }
+      
+      .mouth-text {
+        font-size: 0.9rem;
+      }
+      
+      .number-bubble {
+        font-size: 0.7rem;
+      }
+      
+      .difficulty-title {
+        font-size: 1.1rem;
+      }
+      
+      .difficulty-name {
+        font-size: 0.8rem;
+      }
+      
+      .difficulty-info {
+        font-size: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  
+  <div class="character character-1">🧮</div>
+  <div class="character character-2">🔢</div>
+  <div class="character character-3">⭐</div>
+  
+  <div class="score">Ball: <span id="scoreValue">0</span></div>
+  
+  <h1>🧠 Matematika O'yini</h1>
+  <div class="container">
+    <!-- Boshlang'ich holat -->
+    <div id="welcomeScreen">
+      <div class="welcome-text">Boshlaymizmi</div>
+      
+      <!-- Qiyinlik darajasini tanlash -->
+      <div class="difficulty-selection">
+        <div class="difficulty-title">Qiyinlik darajasini tanlang:</div>
+        
+        <!-- Yuz shakli -->
+        <div class="face-container">
+          <!-- 3 ta Ko'z (1, 2, 3 xonali) -->
+          <div class="eyes">
+            <button class="difficulty-btn eye-btn" data-difficulty="1">
+              <span class="difficulty-name">1 xonali</span>
+              <span class="difficulty-info">(1-9)</span>
+            </button>
+            <button class="difficulty-btn eye-btn" data-difficulty="2">
+              <span class="difficulty-name">2 xonali</span>
+              <span class="difficulty-info">(1-99)</span>
+            </button>
+            <button class="difficulty-btn eye-btn" data-difficulty="3">
+              <span class="difficulty-name">3 xonali</span>
+              <span class="difficulty-info">(100-999)</span>
+            </button>
+          </div>
+          
+          <!-- Og'iz (1-999 sonlari) -->
+          <div class="mouth-container">
+            <div class="mouth">
+              <div class="numbers-flow" id="numbersFlow"></div>
+              <div class="mouth-text">1 dan 999 gacha</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <button id="startBtn">O'YINNI BOSHLASH</button>
+    </div>
+
+    <!-- O'yin davomida -->
+    <div id="gameScreen" class="hidden">
+      <div id="numberDisplay"></div>
+      <div class="input-container">
+        <input type="number" id="answerInput" placeholder="Javob" min="-9999" max="9999">
+      </div>
+      <button id="submitBtn" class="submit-btn">TEKSHIRISH</button>
+    </div>
+
+    <!-- Natija -->
+    <div id="resultScreen" class="hidden">
+      <div id="resultMessage" class="result-message"></div>
+      <button id="playAgainBtn">YANA O'YNAYMIZMI?</button>
+    </div>
+  </div>
+
+  <canvas id="fireworks"></canvas>
+
+  <!-- Audio fayllar -->
+  <audio id="dingSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mp3">
+  </audio>
+  <audio id="correctSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mp3">
+  </audio>
+  <audio id="wrongSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mp3">
+  </audio>
+  
+  <script>
+    // ==================== ASOSIY KOD ====================
+    
+    // Elementlarni olish
+    const startBtn = document.getElementById("startBtn");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const numberDisplay = document.getElementById("numberDisplay");
+    const answerInput = document.getElementById("answerInput");
+    const resultMessage = document.getElementById("resultMessage");
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const resultScreen = document.getElementById("resultScreen");
+    const ding = document.getElementById("dingSound");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    const scoreValue = document.getElementById("scoreValue");
+    const difficultyBtns = document.querySelectorAll(".difficulty-btn");
+
+    // Canvas o'lchamini sozlash
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // O'zgaruvchilar
+    let fireworks = [];
+    let score = 0;
+    let correctAnswer = 0;
+    let currentNumbers = [];
+    let level = 1;
+    let selectedDifficulty = 1;
+
+    // ==================== 1-999 SONLARI ANIMATSIYASI ====================
+    
+    function startNumberAnimation() {
+      console.log("🔢 1-999 sonlari animatsiyasi boshlanmoqda...");
+      
+      const mouth = document.querySelector('.mouth');
+      if (!mouth) {
+        console.log("❌ Og'iz topilmadi, 1 soniyadan keyin qayta urinib ko'ramiz");
+        setTimeout(startNumberAnimation, 1000);
+        return;
+      }
+      
+      // numbersFlow elementini topish yoki yaratish
+      let numbersFlow = document.getElementById('numbersFlow');
+      if (!numbersFlow) {
+        console.log("⚠️ numbersFlow topilmadi, yangisini yaratamiz...");
+        numbersFlow = document.createElement('div');
+        numbersFlow.id = 'numbersFlow';
+        numbersFlow.className = 'numbers-flow';
+        mouth.appendChild(numbersFlow);
+      }
+      
+      console.log("✅ numbersFlow tayyor:", numbersFlow);
+      
+      // Avvalgi animatsiyani tozalash
+      numbersFlow.innerHTML = '';
+      if (window.animationTimer) {
+        clearInterval(window.animationTimer);
+      }
+      
+      // Yangi animatsiyani boshlash
+      let counter = 0;
+      window.animationTimer = setInterval(() => {
+        if (counter < 20) {
+          createNumber();
+          createNumber();
+          counter++;
+        } else {
+          createNumber();
+        }
+      }, 150);
+      
+      console.log("🎉 1-999 sonlari animatsiyasi ISHGA TUSHDI!");
+    }
+    
+    function createNumber() {
+      const numbersFlow = document.getElementById('numbersFlow');
+      if (!numbersFlow) return;
+      
+      const numberDiv = document.createElement('div');
+      const randomNum = Math.floor(Math.random() * 999) + 1;
+      
+      numberDiv.textContent = randomNum;
+      numberDiv.className = 'number-bubble';
+      numberDiv.style.cssText = `
+        position: absolute;
+        left: ${Math.random() * 80 + 10}%;
+        animation: floatUp ${3 + Math.random() * 3}s linear infinite;
+        animation-delay: ${Math.random() * 2}s;
+        font-size: ${0.7 + Math.random() * 0.8}rem;
+        font-weight: bold;
+        color: ${getRandomColor()};
+        text-shadow: 1px 1px 2px black;
+        z-index: 1;
+        pointer-events: none;
+      `;
+      
+      numbersFlow.appendChild(numberDiv);
+      
+      // 6 soniyadan keyin o'chirish
+      setTimeout(() => {
+        if (numberDiv.parentNode === numbersFlow) {
+          numbersFlow.removeChild(numberDiv);
+        }
+      }, 6000);
+    }
+    
+    function getRandomColor() {
+      const colors = ['#FFFFFF', '#FFEB3B', '#4CAF50', '#2196F3', '#FF9800', '#E91E63'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    // ==================== FIREWORKS ANIMATSIYASI ====================
+    
+    class Firework {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.particles = [];
+        for (let i = 0; i < 25; i++) {
+          this.particles.push({
+            x: x,
+            y: y,
+            dx: (Math.random() - 0.5) * 6,
+            dy: (Math.random() - 0.5) * 6,
+            life: 50
+          });
+        }
+      }
+      update() {
+        this.particles.forEach(p => {
+          p.x += p.dx;
+          p.y += p.dy;
+          p.dy += 0.1;
+          p.life--;
+        });
+      }
+      draw() {
+        this.particles.forEach(p => {
+          if (p.life > 0) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+          }
+        });
+      }
+    }
+
+    function animateFireworks() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fireworks.forEach((f, i) => {
+        f.update();
+        f.draw();
+        f.particles = f.particles.filter(p => p.life > 0);
+        if (f.particles.length === 0) fireworks.splice(i, 1);
+      });
+      requestAnimationFrame(animateFireworks);
+    }
+    animateFireworks();
+
+    function launchFirework(count = 3) {
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * (canvas.height / 2);
+          const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+          fireworks.push(new Firework(x, y, color));
+        }, i * 200);
+      }
+    }
+
+    // ==================== O'YIN MANTIGI ====================
+    
+    // Qiyinlik darajasini tanlash
+    difficultyBtns.forEach(btn => {
+      btn.addEventListener("click", function() {
+        difficultyBtns.forEach(b => b.classList.remove("selected-difficulty"));
+        this.classList.add("selected-difficulty");
+        selectedDifficulty = parseInt(this.getAttribute("data-difficulty"));
+        console.log("Tanlangan daraja:", selectedDifficulty);
+      });
+    });
+
+    // Boshlang'ich holatda birinchi tugmani tanlangan qilish
+    if (difficultyBtns[0]) {
+      difficultyBtns[0].classList.add("selected-difficulty");
+    }
+
+    // O'yin funksiyalari
+    startBtn.addEventListener("click", startGame);
+    playAgainBtn.addEventListener("click", startGame);
+    submitBtn.addEventListener("click", checkAnswer);
+
+    answerInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    function startGame() {
+      welcomeScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      answerInput.value = "";
+      answerInput.focus();
+      
+      let count = 5 + Math.floor(level / 5);
+      if (count > 5) count = 5;
+      
+      currentNumbers = [];
+      let sum = 0;
+      let i = 0;
+
+      function showNext() {
+        if (i < count) {
+          let minNumber, maxNumber;
+          switch(selectedDifficulty) {
+            case 1:
+              minNumber = 1;
+              maxNumber = 9;
+              break;
+            case 2:
+              minNumber = 1;
+              maxNumber = 99;
+              break;
+            case 3:
+              minNumber = 100;
+              maxNumber = 999;
+              break;
+            default:
+              minNumber = 1;
+              maxNumber = 9;
+          }
+          
+          const num = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+          const sign = Math.random() > 0.5 ? 1 : -1;
+          currentNumbers.push(sign * num);
+          sum += sign * num;
+          numberDisplay.textContent = (sign === 1 ? "+" : "-") + Math.abs(num);
+          
+          try {
+            ding.currentTime = 0;
+            ding.play().catch(e => console.log("Audio error:", e));
+          } catch (e) {
+            console.log("Audio error:", e);
+          }
+          
+          i++;
+          setTimeout(showNext, 1200);
+        } else {
+          numberDisplay.textContent = "?";
+          correctAnswer = sum;
+          console.log("To'g'ri javob:", correctAnswer);
+        }
+      }
+      showNext();
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseInt(answerInput.value);
+      
+      if (isNaN(userAnswer)) {
+        resultMessage.textContent = "Iltimos, raqam kiriting!";
+        resultScreen.classList.remove("hidden");
+        gameScreen.classList.add("hidden");
+        setTimeout(() => {
+          resultScreen.classList.add("hidden");
+          gameScreen.classList.remove("hidden");
+          answerInput.focus();
+        }, 2000);
+        return;
+      }
+      
+      const isCorrect = userAnswer === correctAnswer;
+      
+      if (isCorrect) {
+        score += 10;
+        level = Math.floor(score / 30) + 1;
+        scoreValue.textContent = score;
+        resultMessage.textContent = `✅ To'g'ri! Ajoyib! Daraja: ${level}`;
+        
+        try {
+          correctSound.currentTime = 0;
+          correctSound.play().catch(e => console.log("Audio error:", e));
+        } catch (e) {
+          console.log("Audio error:", e);
+        }
+        
+        launchFirework(5);
+      } else {
+        resultMessage.textContent = `❌ Noto'g'ri! To'g'ri javob: ${correctAnswer}`;
+        
+        try {
+          wrongSound.currentTime = 0;
+          wrongSound.play().catch(e => console.log("Audio error:", e));
+        } catch (e) {
+          console.log("Audio error:", e);
+        }
+      }
+      
+      gameScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+      
+      setTimeout(() => {
+        if (isCorrect) {
+          startGame();
+        } else {
+          resultScreen.classList.add("hidden");
+          gameScreen.classList.remove("hidden");
+          answerInput.value = "";
+          answerInput.focus();
+        }
+      }, isCorrect ? 2000 : 3000);
+    }
+
+    // ==================== DASLABKI SOZLASH ====================
+    
+    // Dastlabki holatni ko'rsatish
+    welcomeScreen.classList.remove("hidden");
+    gameScreen.classList.add("hidden");
+    resultScreen.classList.add("hidden");
+
+    // 1-999 sonlari animatsiyasini boshlash
+    setTimeout(startNumberAnimation, 100);
+    setTimeout(startNumberAnimation, 500);
+    setTimeout(startNumberAnimation, 1000);
+
+    // Og'izga klik qilganda animatsiyani yangilash
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('.mouth') || e.target.closest('.mouth-container')) {
+        console.log("🔄 Animatsiya yangilanmoqda...");
+        startNumberAnimation();
+      }
+    });
+
+    // Har 10 soniyada animatsiyani tekshirish
+    setInterval(() => {
+      const numbersFlow = document.getElementById('numbersFlow');
+      if (!numbersFlow || numbersFlow.children.length < 5) {
+        console.log("🔄 Animatsiya sekinlashdi, yangilaymiz...");
+        startNumberAnimation();
+      }
+    }, 10000);
+
+    console.log("🎮 Matematika O'yini to'liq yuklandi va ishga tushdi!");
+  </script>
+</body>
+</html>
