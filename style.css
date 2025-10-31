@@ -108,4 +108,12 @@
     .body{
         background-size: 100% 100%;
     }
+
+    .menu-list{
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .menu-list-item-3{
+        grid-column: 1/2;
+    }
 }
